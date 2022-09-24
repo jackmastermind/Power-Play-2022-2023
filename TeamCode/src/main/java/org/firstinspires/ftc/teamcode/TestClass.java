@@ -21,7 +21,7 @@ public class TestClass extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         //INITIALIZATION CODE
-        DcMotor Motor1 = hardwareMap.get(DcMotor.class, "Motor1");
+        DcMotor Motor1 = hardwareMap.get(DcMotor.class, "driveFL");
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
