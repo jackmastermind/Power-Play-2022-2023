@@ -29,10 +29,20 @@ public class TestClass extends LinearOpMode {
         runtime.reset();
 
         //RUN ONE TIME CODE HERE
+       // test variable
         int bedtime = 1000;
 
+        // test grabbing inputs from gamepad
+        float leftStickXPos = gamepad1.left_stick_x;
+        while (leftStickXPos < 0) {
+            MotorFL.setPower(-1);
+            MotorFR.setPower(1);
+            Thread.sleep(1);
+            leftStickXPos = gamepad1.left_stick_x;
+        }
+        MotorFL.setPower(0);
+        MotorFR.setPower(0);
         // FL motor moves forward at ~1/3 speed for three seconds
-
         // FL motor moves backwards at full speed for
         // one second, defined by the bedtime variable
         MotorFL.setPower(0.3);
