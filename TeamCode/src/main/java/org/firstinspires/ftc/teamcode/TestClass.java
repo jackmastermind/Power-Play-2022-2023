@@ -29,6 +29,8 @@ public class TestClass extends LinearOpMode {
 
         //RUN ONE TIME CODE HERE
         Motor1.setPower(0.3);
+        Thread.sleep(3000);
+        Motor1.setPower(-1);
         Thread.sleep(1000);
         Motor1.setPower(0);
         // run until the end of the match (driver presses STOP)
