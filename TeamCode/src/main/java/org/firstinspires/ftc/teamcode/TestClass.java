@@ -21,18 +21,23 @@ public class TestClass extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         //INITIALIZATION CODE
-        DcMotor Motor1 = hardwareMap.get(DcMotor.class, "driveFL");
+        DcMotor MotorFL = hardwareMap.get(DcMotor.class, "driveFL");
+        DcMotor MotorFR = hardwareMap.get(DcMotor.class, "driveFR");
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
         runtime.reset();
 
         //RUN ONE TIME CODE HERE
-        Motor1.setPower(0.3);
+        MotorFL.setPower(0.3);
         Thread.sleep(3000);
-        Motor1.setPower(-1);
+        MotorFL.setPower(-1);
         Thread.sleep(1000);
-        Motor1.setPower(0);
+        MotorFL.setPower(0);
+
+        MotorFR.setPower(0.5);
+        Thread.sleep(1500);
+        MotorFR.setPower(0);
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             //LOOPING CODE HERE
