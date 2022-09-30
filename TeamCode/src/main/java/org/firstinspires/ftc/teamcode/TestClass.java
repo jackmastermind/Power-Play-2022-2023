@@ -31,12 +31,17 @@ public class TestClass extends LinearOpMode {
         //RUN ONE TIME CODE HERE
         int bedtime = 1000;
 
+        // FL motor moves forward at ~1/3 speed for three seconds
+
+        // FL motor moves backwards at full speed for
+        // one second, defined by the bedtime variable
         MotorFL.setPower(0.3);
         Thread.sleep(3000);
         MotorFL.setPower(-1);
         Thread.sleep(bedtime);
         MotorFL.setPower(0);
 
+        // FR motor moves forward at half speed for one and a half seconds
         MotorFR.setPower(0.5);
         Thread.sleep(1500);
         MotorFR.setPower(0);
