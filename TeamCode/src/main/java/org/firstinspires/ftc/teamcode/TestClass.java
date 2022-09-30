@@ -20,7 +20,9 @@ public class TestClass extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+
         //INITIALIZATION CODE
+
         DcMotor MotorFL = hardwareMap.get(DcMotor.class, "driveFL");
         DcMotor MotorFR = hardwareMap.get(DcMotor.class, "driveFR");
         telemetry.addData("Status", "Initialized");
@@ -33,15 +35,16 @@ public class TestClass extends LinearOpMode {
         int bedtime = 1000;
 
         // test grabbing inputs from gamepad
-        float leftStickXPos = gamepad1.left_stick_x;
+ /*       float leftStickXPos = gamepad1.left_stick_x;
         while (leftStickXPos < 0) {
             MotorFL.setPower(-1);
             MotorFR.setPower(1);
             Thread.sleep(1);
             leftStickXPos = gamepad1.left_stick_x;
-        }
+
         MotorFL.setPower(0);
         MotorFR.setPower(0);
+  */
         // FL motor moves forward at ~1/3 speed for three seconds
         // FL motor moves backwards at full speed for
         // one second, defined by the bedtime variable
@@ -55,6 +58,7 @@ public class TestClass extends LinearOpMode {
         MotorFR.setPower(0.5);
         Thread.sleep(1500);
         MotorFR.setPower(0);
+
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             //LOOPING CODE HERE
