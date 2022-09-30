@@ -29,10 +29,12 @@ public class TestClass extends LinearOpMode {
         runtime.reset();
 
         //RUN ONE TIME CODE HERE
+        int bedtime = 1000;
+
         MotorFL.setPower(0.3);
         Thread.sleep(3000);
         MotorFL.setPower(-1);
-        Thread.sleep(1000);
+        Thread.sleep(bedtime);
         MotorFL.setPower(0);
 
         MotorFR.setPower(0.5);
