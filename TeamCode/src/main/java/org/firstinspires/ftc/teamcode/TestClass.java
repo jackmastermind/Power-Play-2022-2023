@@ -31,41 +31,42 @@ public class TestClass extends LinearOpMode {
         runtime.reset();
 
         //RUN ONE TIME CODE HERE
-       // test variable
+        // test variable
         int bedtime = 1000;
 
         // test grabbing inputs from gamepad
- /*       float leftStickXPos = gamepad1.left_stick_x;
+        float leftStickXPos = gamepad1.left_stick_x;
         while (leftStickXPos < 0) {
             MotorFL.setPower(-1);
             MotorFR.setPower(1);
             Thread.sleep(1);
             leftStickXPos = gamepad1.left_stick_x;
 
-        MotorFL.setPower(0);
-        MotorFR.setPower(0);
-  */
-        // FL motor moves forward at ~1/3 speed for three seconds
-        // FL motor moves backwards at full speed for
-        // one second, defined by the bedtime variable
-        MotorFL.setPower(0.3);
-        Thread.sleep(3000);
-        MotorFL.setPower(-1);
-        Thread.sleep(bedtime);
-        MotorFL.setPower(0);
+            MotorFL.setPower(0);
+            MotorFR.setPower(0);
 
-        // FR motor moves forward at half speed for one and a half seconds
-        MotorFR.setPower(0.5);
-        Thread.sleep(1500);
-        MotorFR.setPower(0);
+            // FL motor moves forward at ~1/3 speed for three seconds
+            // FL motor moves backwards at full speed for
+            // one second, defined by the bedtime variable
+            MotorFL.setPower(0.3);
+            Thread.sleep(3000);
+            MotorFL.setPower(-1);
+            Thread.sleep(bedtime);
+            MotorFL.setPower(0);
 
-        // run until the end of the match (driver presses STOP)
-        while (opModeIsActive()) {
-            //LOOPING CODE HERE
-            telemetry.addData("Status", "Running");
-            telemetry.update();
+            // FR motor moves forward at half speed for one and a half seconds
+            MotorFR.setPower(0.5);
+            Thread.sleep(1500);
+            MotorFR.setPower(0);
 
-            //test comment
+            // run until the end of the match (driver presses STOP)
+            while (opModeIsActive()) {
+                //LOOPING CODE HERE
+                telemetry.addData("Status", "Running");
+                telemetry.update();
+
+                //test comment
+            }
         }
     }
 }
