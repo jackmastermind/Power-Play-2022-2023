@@ -23,6 +23,7 @@ public class Experimental_ChickenDrive_Do_Not_Use extends LinearOpMode {
 
         DcMotor MotorLeft = hardwareMap.get(DcMotor.class, "driveLeft");
         DcMotor MotorRight = hardwareMap.get(DcMotor.class, "driveRight");
+        MotorRight.setDirection(DcMotor.Direction.REVERSE);
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
@@ -72,8 +73,8 @@ public class Experimental_ChickenDrive_Do_Not_Use extends LinearOpMode {
                 mrPower = -1;
             }
 
-            MotorLeft.setPower(mlPower);
-            MotorRight.setPower(mrPower);
+            MotorLeft.setPower(mlPower * 0.5);
+            MotorRight.setPower(mrPower * 0.5);
 
             telemetry.addData("Status", "Running");
             telemetry.update();
