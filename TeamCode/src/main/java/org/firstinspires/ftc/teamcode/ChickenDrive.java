@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
@@ -23,6 +24,7 @@ public class ChickenDrive extends LinearOpMode {
 
         DcMotor MotorLeft = hardwareMap.get(DcMotor.class, "driveLeft");
         DcMotor MotorRight = hardwareMap.get(DcMotor.class, "driveRight");
+        MotorRight.setDirection(DcMotor.Direction.REVERSE);
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
