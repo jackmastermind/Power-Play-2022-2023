@@ -41,7 +41,7 @@ public class Experimental_ChickenDrive_Do_Not_Use extends LinearOpMode {
         while (opModeIsActive()) {
             //LOOPING CODE HERE
 
-            stickXPos = gamepad1.right_stick_x;
+            stickXPos = gamepad1.right_stick_x * 0.3;
             stickYPos = gamepad1.right_stick_y;
 
             mlPower = stickYPos;
