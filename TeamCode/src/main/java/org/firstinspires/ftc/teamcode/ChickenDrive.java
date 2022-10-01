@@ -37,8 +37,8 @@ public class ChickenDrive extends LinearOpMode {
         while (opModeIsActive()) {
             //LOOPING CODE HERE
 
-            MotorLeft.setPower(gamepad1.left_stick_y);
-            MotorRight.setPower(gamepad1.right_stick_y);
+            MotorLeft.setPower(gamepad1.left_stick_y * 0.5);
+            MotorRight.setPower(gamepad1.right_stick_y * 0.5);
 
             telemetry.addData("Status", "Running");
             telemetry.addData("Left Wheel Power", gamepad1.left_stick_y);
