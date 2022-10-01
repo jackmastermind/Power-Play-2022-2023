@@ -48,13 +48,13 @@ public class Experimental_ChickenDrive_Do_Not_Use extends LinearOpMode {
             mrPower = stickYPos;
 
             if (stickXPos < 0) {
-                mlPower = mlPower + stickXPos;
-                mrPower = mrPower - stickXPos;
+                mlPower = mlPower - stickXPos;
+                mrPower = mrPower + stickXPos;
             }
 
             if (stickXPos > 0) {
-                mlPower = mlPower + stickXPos;
-                mrPower = mrPower - stickXPos;
+                mlPower = mlPower - stickXPos;
+                mrPower = mrPower + stickXPos;
             }
 
             if (mlPower > 1) {
