@@ -53,8 +53,8 @@ public class Experimental_ChickenDrive_Do_Not_Use extends LinearOpMode {
             }
 
             if (stickXPos > 0) {
-                mlPower = mlPower - stickXPos;
-                mrPower = mrPower + stickXPos;
+                mlPower = mlPower + stickXPos;
+                mrPower = mrPower - stickXPos;
             }
 
             if (mlPower > 1) {
@@ -73,8 +73,8 @@ public class Experimental_ChickenDrive_Do_Not_Use extends LinearOpMode {
                 mrPower = -1;
             }
 
-            MotorLeft.setPower(mlPower * 0.5);
-            MotorRight.setPower(mrPower * 0.5);
+            MotorLeft.setPower(mlPower * 0.4);
+            MotorRight.setPower(mrPower * 0.4);
 
             telemetry.addData("Status", "Running");
             telemetry.update();
