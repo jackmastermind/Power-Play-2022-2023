@@ -19,11 +19,20 @@ public class Experimental_ChickenDrive_Do_Not_Use extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        //INITIALIZATION CODE
+        // INITIALIZATION CODE
 
+        // Initialize
         DcMotor MotorLeft = hardwareMap.get(DcMotor.class, "driveLeft");
         DcMotor MotorRight = hardwareMap.get(DcMotor.class, "driveRight");
+
+        // When motor power is 0, it brakes
+        MotorLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        MotorRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        // Fix reversed right motor
         MotorRight.setDirection(DcMotor.Direction.REVERSE);
+
+        // Telemetry
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
@@ -44,7 +53,7 @@ public class Experimental_ChickenDrive_Do_Not_Use extends LinearOpMode {
             stickXPos = gamepad1.right_stick_x;
             stickYPos = gamepad1.right_stick_y;
 
-            stickXPos = stickXPos * (float)0.5;
+            stickXPos = stickXPos * (float)0.3;
 
             mlPower = stickYPos;
             mrPower = stickYPos;
