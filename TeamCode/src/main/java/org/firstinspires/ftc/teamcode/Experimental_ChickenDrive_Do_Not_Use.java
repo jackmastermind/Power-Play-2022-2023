@@ -87,6 +87,11 @@ public class Experimental_ChickenDrive_Do_Not_Use extends LinearOpMode {
             MotorLeft.setPower(mlPower * 0.4);
             MotorRight.setPower(mrPower * 0.4);
 
+            telemetry.addData("stickXPos", stickXPos);
+            telemetry.addData("stickYPos", stickYPos);
+            telemetry.addData("mlPower", mlPower);
+            telemetry.addData("mrPower", mrPower);
+
             telemetry.addData("Status", "Running");
             telemetry.update();
 
