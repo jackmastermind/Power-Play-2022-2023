@@ -36,13 +36,15 @@ public class ChickenDrive extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             //LOOPING CODE HERE
+            double mlPower = Math.pow(gamepad1.left_stick_y, 3);
+            double mrPower = Math.pow(gamepad1.right_stick_x, 3);
 
-            MotorLeft.setPower(gamepad1.left_stick_y * 0.5);
-            MotorRight.setPower(gamepad1.right_stick_y * 0.5);
+            MotorLeft.setPower(mlPower);
+            MotorRight.setPower(mrPower);
 
             telemetry.addData("Status", "Running");
-            telemetry.addData("Left Wheel Power", gamepad1.left_stick_y);
-            telemetry.addData("Right Wheel Power", gamepad1.right_stick_y);
+            telemetry.addData("Left Wheel Power", mlPower);
+            telemetry.addData("Right Wheel Power", mrPower);
 
             telemetry.update();
 
