@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
@@ -11,14 +10,14 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Use this as a template for making new opmodes.
  */
 
-@TeleOp(name="ChickenDrive")
-public class ChickenDrive extends LinearOpMode {
+@TeleOp(name="ChickenDriveTank")
+public class ChickenDriveTank extends LinearOpMode {
 
     // Declare OpMode members.
-    private ElapsedTime runtime = new ElapsedTime();
+    private final ElapsedTime runtime = new ElapsedTime();
 
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode() {
 
         //INITIALIZATION CODE
 
@@ -31,7 +30,6 @@ public class ChickenDrive extends LinearOpMode {
         runtime.reset();
 
         // CHICKEN CODE BELOW HERE
-
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
