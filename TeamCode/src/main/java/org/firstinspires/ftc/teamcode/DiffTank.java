@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Use this as a template for making new opmodes.
  */
 
-@TeleOp(name="BlankOpMode")
+@TeleOp(name="DiffTank")
 @Disabled
 public class DiffTank extends LinearOpMode {
 
