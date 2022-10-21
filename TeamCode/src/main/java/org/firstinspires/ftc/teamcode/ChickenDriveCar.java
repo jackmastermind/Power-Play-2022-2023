@@ -16,8 +16,6 @@ public class ChickenDriveCar extends LinearOpMode {
 
     // Declare OpMode members.
     private final ElapsedTime runtime = new ElapsedTime();
-    private DcMotor MotorLeft;
-    private DcMotor MotorRight;
     private Servo servo;
     private boolean eggBeingDropped = false;
 
@@ -26,9 +24,9 @@ public class ChickenDriveCar extends LinearOpMode {
         @Override
         public void run() {
             eggBeingDropped = true;
-            servo.setPosition(180);
+            servo.setPosition(0.5);
             try {
-                Thread.sleep(1000);
+                Thread.sleep(5000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -44,12 +42,12 @@ public class ChickenDriveCar extends LinearOpMode {
 
         //INITIALIZATION CODE
 
-        MotorLeft = hardwareMap.get(DcMotor.class, "driveLeft");
-        MotorRight = hardwareMap.get(DcMotor.class, "driveRight");
+        DcMotor motorLeft = hardwareMap.get(DcMotor.class, "driveLeft");
+        DcMotor motorRight = hardwareMap.get(DcMotor.class, "driveRight");
         servo = hardwareMap.get(Servo.class, "servo");
         servo.setPosition(0);
 
-        MotorRight.setDirection(DcMotor.Direction.REVERSE);
+        motorRight.setDirection(DcMotor.Direction.REVERSE);
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
@@ -72,8 +70,8 @@ public class ChickenDriveCar extends LinearOpMode {
             double mlPower = (forwardInput - turningInput) * 0.5;
             double mrPower = (forwardInput + turningInput) * 0.5;
 
-            MotorLeft.setPower(mlPower);
-            MotorRight.setPower(mrPower);
+            motorLeft.setPower(mlPower);
+            motorRight.setPower(mrPower);
 
             telemetry.addData("Status", "Running");
             telemetry.addData("Left Wheel Power", mlPower);
