@@ -26,7 +26,7 @@ public class ChickenDriveCar extends LinearOpMode {
             eggBeingDropped = true;
             servo.setPosition(0.5);
             try {
-                Thread.sleep(5000);
+                Thread.sleep(2500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -44,6 +44,10 @@ public class ChickenDriveCar extends LinearOpMode {
 
         DcMotor motorLeft = hardwareMap.get(DcMotor.class, "driveLeft");
         DcMotor motorRight = hardwareMap.get(DcMotor.class, "driveRight");
+        motorLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motorRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+
         servo = hardwareMap.get(Servo.class, "servo");
         servo.setPosition(0);
 
