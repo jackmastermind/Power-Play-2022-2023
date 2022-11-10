@@ -34,7 +34,7 @@ public class DiffDrive extends LinearOpMode
         while (opModeIsActive()) {
 
             //PUT STUFF HERE
-            SetPod1Powers();
+            diff.SetPod1Powers(gamepad1);
 
             //RECORDING STUFF BUTTONS
             if (gamepad1.right_trigger >= 0.75)
@@ -71,23 +71,7 @@ public class DiffDrive extends LinearOpMode
         }
     }
 
-    void SetPod1Powers(){
-        double inputAngle = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x);
 
-        double e = diff.getLeftRotationalError(Math.toDegrees(inputAngle));
-        //diff.GetPIDValue(e)
-        double inputMagnitude = diff.StickMagnitude(gamepad1.left_stick_x, gamepad1.left_stick_y);
-
-        double m1 = inputMagnitude + diff.GetPIDValue(e);
-        double m2 = -inputMagnitude + diff.GetPIDValue(e);
-
-        double[] pows = diff.NormalizeScale(m1, m2);
-
-        double m1Power = pows[0];
-        double m2Power = pows[1];
-
-        //TODO MAKE MOTOR CONFIGURATION
-    }
 
 
 

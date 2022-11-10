@@ -152,6 +152,16 @@ public class DiffSwerve {
         return Math.sqrt(Math.pow(a, 2)+Math.pow(b, 2));
     }
 
+    public double getStickAngle(Gamepad gamepad1)
+    {
+        double degrees = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x) / Math.PI * 180;
+        if (degrees < 0)
+        {
+            degrees += 360;
+        }
+        return degrees;
+    }
+
     //endregion
 
     //region Set Power Methods
@@ -176,34 +186,23 @@ public class DiffSwerve {
     /**
      * Set the power of each motor for Pod 1
      */
-    private void SetPod1Powers(Gamepad gamepad1){
+    public void SetPod1Powers(Gamepad gamepad1){
+        double inputAngle = getStickAngle(gamepad1);
 
-        //The "error amount" for the desired POD should be the only variable needed for this part.
-        //We could just get it from a get function (if there is one) or add it as an input to
-        //this function.
+        double e = getLeftRotationalError(Math.toDegrees(inputAngle));
+        //diff.GetPIDValue(e)
+        double inputMagnitude = StickMagnitude(gamepad1.left_stick_x, gamepad1.left_stick_y);
 
-        //Motor1 Power = (normalized) Magnitude of joystick + Angle Correction Value
-        //Motor2 Power = (normalized) -Magnitude of joystick + Angle Correction Value
+        double m1 = inputMagnitude + GetPIDValue(e);
+        double m2 = -inputMagnitude + GetPIDValue(e);
 
-        double error = 0; //REPLACE THIS WITH JACK'S THING!
-        double inputMagnitude = StickMagnitude(Math.abs(gamepad1.right_stick_x), Math.abs(gamepad1.right_stick_y));
+        double[] pows = NormalizeScale(m1, m2);
 
-        //Un-normalized amount
-        double P1 = inputMagnitude + GetPIDValue(error);
-        double P2 = -inputMagnitude + GetPIDValue(error);
+        double m1Power = pows[0];
+        double m2Power = pows[1];
 
-        //TODO: ADD ROTATIONAL STUFF!
-
-        //Normalized amount
-        double Motor1Pow = NormalizeScale(P1, P2)[0];
-        double Motor2Pow = NormalizeScale(P1, P2)[1];;
-
-
-        //SET MOTOR POWER
-        //masterHardware.frontLeft.setPower(M1LPower);
-        //masterHardware.frontRight.setPower(M1RPower);
-        //masterHardware.backLeft.setPower(M2LPower);
-        //masterHardware.backRight.setPower(M2RPower);
+        leftTop.setPower(m1Power);
+        leftBottom.setPower(m2Power);
     }
 
     /**
