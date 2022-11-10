@@ -29,7 +29,7 @@ public class DiffSwerve {
         for (DcMotor motor: motors) {
             motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
     }
 
@@ -161,6 +161,16 @@ public class DiffSwerve {
     private void SetPowers(Gamepad gamepad1){
         SetPod1Powers(gamepad1);
         SetPod2Powers(gamepad1);
+    }
+
+    public double getLeftRotationalError(double targetDegrees)
+    {
+        return (targetDegrees - getLeftPodRotation()) % 360;
+    }
+
+    public double getRightRotationalError(double targetDegrees)
+    {
+        return (targetDegrees - getRightPodRotation()) % 360;
     }
 
     /**
