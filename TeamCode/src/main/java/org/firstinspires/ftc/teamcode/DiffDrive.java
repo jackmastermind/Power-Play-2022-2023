@@ -15,8 +15,12 @@ public class DiffDrive extends LinearOpMode
     double M2LPower = 0;
     double M2RPower = 0;
 
+    DiffSwerve diff = new DiffSwerve();
+
     public void runOpMode()
     {
+        diff.initialize(hardwareMap);
+
         ElapsedTime runtime = new ElapsedTime();
         masterHardware.init(hardwareMap);
         MotorRecorder recorder = new MotorRecorder(runtime, masterHardware, 0.01, telemetry);
@@ -28,9 +32,9 @@ public class DiffDrive extends LinearOpMode
         runtime.reset();
 
         while (opModeIsActive()) {
-            masterHardware.spool.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
             //PUT STUFF HERE
+            SetPod1Powers();
 
             //RECORDING STUFF BUTTONS
             if (gamepad1.right_trigger >= 0.75)
@@ -45,6 +49,7 @@ public class DiffDrive extends LinearOpMode
                 }
             }
 
+            //region Set Motor Power and Telemetry
             //SET MOTOR POWER
             masterHardware.frontLeft.setPower(M1LPower);
             masterHardware.frontRight.setPower(M1RPower);
@@ -62,11 +67,32 @@ public class DiffDrive extends LinearOpMode
             telemetry.addData("Motor 2 Right", M2RPower);
 
             telemetry.update();
+            //endregion
         }
+    }
+
+    void SetPod1Powers(){
+        double inputAngle = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x);
+
+        double e = diff.getLeftRotationalError(Math.toDegrees(inputAngle));
+        //diff.GetPIDValue(e)
+        double inputMagnitude = diff.StickMagnitude(gamepad1.left_stick_x, gamepad1.left_stick_y);
+
+        double m1 = inputMagnitude + diff.GetPIDValue(e);
+        double m2 = -inputMagnitude + diff.GetPIDValue(e);
+
+        double[] pows = diff.NormalizeScale(m1, m2);
+
+        double m1Power = pows[0];
+        double m2Power = pows[1];
+
+        //TODO MAKE MOTOR CONFIGURATION
     }
 
 
 
+
+    /*
     //Proportional constant (counters current error)
     double Kp = 1;
     //Integral constant (counters cumulated error)
@@ -81,7 +107,7 @@ public class DiffDrive extends LinearOpMode
      * Uses PID Controller to generate a correction value given an error value.
      * @param error Difference between desired and current value
      * @return Correction value
-     */
+     *
     private double GetPIDValue(double error){
         double proportion = Kp * error;
         double integral = Ki * error;
@@ -98,7 +124,7 @@ public class DiffDrive extends LinearOpMode
      * @param pow1 The power value of one motor
      * @param pow2 The power value of another motor
      * @return An array of the two motor power values values scaled down within 0-1
-     */
+     *
     private double[] NormalizeScale(double pow1, double pow2){
         //Check if any wheel power value is greater than one
         if(pow1>1 || pow2>1){
@@ -119,7 +145,7 @@ public class DiffDrive extends LinearOpMode
 
     /**
      * Used to call both functions for setting the motor powers of each pod
-     */
+     *
     private void SetPowers(){
         SetPod1Powers();
         SetPod2Powers();
@@ -127,7 +153,7 @@ public class DiffDrive extends LinearOpMode
 
     /**
      * Set the power of each motor for Pod 1
-     */
+     *
     private void SetPod1Powers(){
 
         //The "error amount" for the desired POD should be the only variable needed for this part.
@@ -160,7 +186,7 @@ public class DiffDrive extends LinearOpMode
 
     /**
      * Set the power of each motor for Pod 1
-     */
+     *
     private void SetPod2Powers(){
 
         //The "error amount" for the desired POD should be the only variable needed for this part.
@@ -190,5 +216,6 @@ public class DiffDrive extends LinearOpMode
         //masterHardware.backLeft.setPower(M2LPower);
         //masterHardware.backRight.setPower(M2RPower);
     }
+    */
 }
 
