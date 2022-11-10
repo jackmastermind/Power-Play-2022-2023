@@ -5,6 +5,12 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 
+/**
+ * Class for storing methods used for the DiffDrive OpMode
+ *
+ * @author Logan Wood
+ * @author Jack Thompson
+ */
 public class DiffSwerve {
     public DcMotor leftTop, leftBottom, rightTop, rightBottom;
     public DcMotor[] motors;
@@ -27,6 +33,7 @@ public class DiffSwerve {
         }
     }
 
+    //region Get Position and Rotation Methods
     public double getLeftPodRotation() {
         double netTicks = leftTop.getCurrentPosition() + leftBottom.getCurrentPosition() / 2.0;
 
@@ -53,7 +60,9 @@ public class DiffSwerve {
 
         return netTicks * TICKS_TO_DEGREES * POD_GEAR_RATIO * POD_ROTATION_TO_WHEEL_RATIO;
     }
+    //endregion
 
+    //region Jack's SetPower Methods (I think)
     public void setLeftPower(double power)
     {
         leftBottom.setPower(-power);
@@ -89,6 +98,10 @@ public class DiffSwerve {
         setLeftAngularPower(power);
         setRightAngularPower(power);
     }
+
+    //endregion
+
+    //region Number Manipulation Methods
 
     //Proportional constant (counters current error)
     double Kp = 1;
@@ -139,7 +152,9 @@ public class DiffSwerve {
         return Math.sqrt(Math.pow(a, 2)+Math.pow(b, 2));
     }
 
+    //endregion
 
+    //region Set Power Methods
     /**
      * Used to call both functions for setting the motor powers of each pod
      */
@@ -213,4 +228,5 @@ public class DiffSwerve {
         //masterHardware.backLeft.setPower(M2LPower);
         //masterHardware.backRight.setPower(M2RPower);
     }
+    //endregion
 }
