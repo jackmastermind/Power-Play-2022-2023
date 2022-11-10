@@ -11,7 +11,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @TeleOp(name="DiffTank")
-@Disabled
 public class DiffTank extends LinearOpMode {
 
     // Declare OpMode members.
