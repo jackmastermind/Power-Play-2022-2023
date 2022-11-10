@@ -118,7 +118,7 @@ public class DiffSwerve {
      * @param error Difference between desired and current value
      * @return Correction value
      */
-    private double GetPIDValue(double error){
+    public double GetPIDValue(double error){
         double proportion = Kp * error;
         double integral = Ki * error;
         double derivative = Kd * (error - lastError);
@@ -135,7 +135,7 @@ public class DiffSwerve {
      * @param pow2 The power value of another motor
      * @return An array of the two motor power values values scaled down within 0-1
      */
-    private double[] NormalizeScale(double pow1, double pow2){
+    public double[] NormalizeScale(double pow1, double pow2){
         //Check if any wheel power value is greater than one
         if(pow1>1 || pow2>1){
             double i = Math.max(Math.abs(pow1), Math.abs(pow2)); //Get the abs of the greater power
@@ -148,7 +148,7 @@ public class DiffSwerve {
         }
     }
 
-    double StickMagnitude(double a, double b){
+    public double StickMagnitude(double a, double b){
         return Math.sqrt(Math.pow(a, 2)+Math.pow(b, 2));
     }
 
