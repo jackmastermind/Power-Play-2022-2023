@@ -19,13 +19,23 @@ public class DiffSwerve {
     public static final double POD_GEAR_RATIO = 0;
     public static final double POD_ROTATION_TO_WHEEL_RATIO = 0;
 
+    //Proportional constant (counters current error)
+    double Kp = 1;
+    //Integral constant (counters cumulated error)
+    double Ki = 1;
+    //Derivative constant (fights oscillation)
+    double Kd = 1;
+
+
+    double lastError = 0;
+
     public void initialize(HardwareMap hardwareMap) {
         leftTop = hardwareMap.get(DcMotor.class, "leftTop");
         leftBottom = hardwareMap.get(DcMotor.class, "leftBottom");
         rightTop = hardwareMap.get(DcMotor.class, "rightTop");
         rightBottom = hardwareMap.get(DcMotor.class, "rightBottom");
         motors = new DcMotor[] {leftTop, leftBottom, rightTop, rightBottom};
-        //DO SOMETHING TO ZERO THE PODS HERE
+        //TODO: SOMETHING TO ZERO THE PODS HERE
         for (DcMotor motor: motors) {
             motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -103,16 +113,6 @@ public class DiffSwerve {
 
     //region Number Manipulation Methods
 
-    //Proportional constant (counters current error)
-    double Kp = 1;
-    //Integral constant (counters cumulated error)
-    double Ki = 1;
-    //Derivative constant (fights oscillation)
-    double Kd = 1;
-
-    double value = 0;
-    double lastError = 0;
-
     /**
      * Uses PID Controller to generate a correction value given an error value.
      * @param error Difference between desired and current value
@@ -124,9 +124,7 @@ public class DiffSwerve {
         double derivative = Kd * (error - lastError);
         lastError = error;
 
-        value = proportion + integral + derivative;
-
-        return value;
+        return proportion + integral + derivative;
     }
 
     /**
@@ -137,14 +135,12 @@ public class DiffSwerve {
      */
     public double[] NormalizeScale(double pow1, double pow2){
         //Check if any wheel power value is greater than one
-        if(pow1>1 || pow2>1){
+        if(Math.abs(pow1)>1 || Math.abs(pow2)>1){
             double i = Math.max(Math.abs(pow1), Math.abs(pow2)); //Get the abs of the greater power
-            double normPow[] = {pow1/i, pow2/i}; //Create a new array of the scaled down powers
-            return normPow;
+            return new double[]{pow1/i, pow2/i};
         }
         else{
-            double regPow[] = {pow1, pow2}; //Return same values if none exceed 1
-            return regPow;
+            return new double[]{pow1, pow2};
         }
     }
 
@@ -189,7 +185,7 @@ public class DiffSwerve {
     public void SetPod1Powers(Gamepad gamepad1){
         double inputAngle = getStickAngle(gamepad1);
 
-        double e = getLeftRotationalError(Math.toDegrees(inputAngle));
+        double e = getLeftRotationalError(inputAngle);
         //diff.GetPIDValue(e)
         double inputMagnitude = StickMagnitude(gamepad1.left_stick_x, gamepad1.left_stick_y);
 
@@ -209,33 +205,22 @@ public class DiffSwerve {
      * Set the power of each motor for Pod 1
      */
     private void SetPod2Powers(Gamepad gamepad1){
+        double inputAngle = getStickAngle(gamepad1);
 
-        //The "error amount" for the desired POD should be the only variable needed for this part.
-        //We could just get it from a get function (if there is one) or add it as an input to
-        //this function.
+        double e = getRightRotationalError(inputAngle);
+        //diff.GetPIDValue(e)
+        double inputMagnitude = StickMagnitude(gamepad1.left_stick_x, gamepad1.left_stick_y);
 
-        //Motor1 Power = (normalized) Magnitude of joystick + Angle Correction Value
-        //Motor2 Power = (normalized) -Magnitude of joystick + Angle Correction Value
+        double m1 = inputMagnitude + GetPIDValue(e);
+        double m2 = -inputMagnitude + GetPIDValue(e);
 
-        double error = 0; //REPLACE THIS WITH JACK'S THING!
-        double inputMagnitude = StickMagnitude(Math.abs(gamepad1.right_stick_x), Math.abs(gamepad1.right_stick_y));
+        double[] pows = NormalizeScale(m1, m2);
 
-        //Un-normalized amount
-        double P3 = inputMagnitude + GetPIDValue(error);
-        double P4 = -inputMagnitude + GetPIDValue(error);
+        double m1Power = pows[0];
+        double m2Power = pows[1];
 
-        //TODO: ADD ROTATIONAL STUFF!
-
-        //Normalized amount
-        double Motor1Pow = NormalizeScale(P3, P4)[0];
-        double Motor2Pow = NormalizeScale(P3, P4)[1];;
-
-
-        //SET MOTOR POWER
-        //masterHardware.frontLeft.setPower(M1LPower);
-        //masterHardware.frontRight.setPower(M1RPower);
-        //masterHardware.backLeft.setPower(M2LPower);
-        //masterHardware.backRight.setPower(M2RPower);
+        rightTop.setPower(m1Power);
+        rightBottom.setPower(m2Power);
     }
     //endregion
 }
