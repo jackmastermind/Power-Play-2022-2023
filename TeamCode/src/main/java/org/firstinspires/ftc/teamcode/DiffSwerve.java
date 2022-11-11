@@ -278,6 +278,10 @@ public class DiffSwerve {
         double m1Power = pows[0];
         double m2Power = pows[1];
 
+        //FOR TESTING (DELETE LATER)
+        m1Power *= 0.2;
+        m2Power *= 0.2;
+
         topMotor.setPower(m1Power);
         bottomMotor.setPower(m2Power);
     }
