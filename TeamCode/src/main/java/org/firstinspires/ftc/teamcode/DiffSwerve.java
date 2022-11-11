@@ -18,6 +18,7 @@ public class DiffSwerve {
     public static final double TICKS_TO_DEGREES = 360.0 / 537.7; // 360 / ticks per rotation
     public static final double POD_GEAR_RATIO = 1;
     public static final double POD_ROTATION_TO_WHEEL_RATIO = 1;
+    public static final double WHEEL_CIRCUMFERENCE = 1;
 
     //Proportional constant (counters current error)
     double Kp = 1;
@@ -28,13 +29,16 @@ public class DiffSwerve {
 
     double lastError = 0;
 
-    public void initialize(HardwareMap hardwareMap) {
+    public void initialize(HardwareMap hardwareMap) throws InterruptedException {
         leftTop = hardwareMap.get(DcMotor.class, "leftTop");
         leftBottom = hardwareMap.get(DcMotor.class, "leftBottom");
         rightTop = hardwareMap.get(DcMotor.class, "rightTop");
         rightBottom = hardwareMap.get(DcMotor.class, "rightBottom");
         motors = new DcMotor[] {leftTop, leftBottom, rightTop, rightBottom};
         //TODO: SOMETHING TO ZERO THE PODS HERE
+        setLeftAngle(0, 0.5);
+        setRightAngle(0, 0.5);
+
         for (DcMotor motor: motors) {
             motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -92,7 +96,7 @@ public class DiffSwerve {
     }
     //endregion
 
-    //region Jack's SetPower Methods (I think)
+    //region Programmatically Set Power & Angle Methods
     public void setLeftPower(double power)
     {
         leftBottom.setPower(-power);
@@ -136,6 +140,9 @@ public class DiffSwerve {
         }
 
         topMotor.setPower(power);
+
+        topMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        bottomMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public void setLeftAngle(double angle, double power) throws InterruptedException {
@@ -144,6 +151,34 @@ public class DiffSwerve {
 
     public void setRightAngle(double angle, double power) throws InterruptedException {
         setPodAngle(angle, power, leftTop, leftBottom);
+    }
+
+    public void driveInches(double inches, double power) throws InterruptedException {
+        int tickDiff = (int) Math.round(inches / TICKS_TO_DEGREES / POD_GEAR_RATIO / POD_ROTATION_TO_WHEEL_RATIO / WHEEL_CIRCUMFERENCE);
+
+        for (DcMotor motor: motors)
+        {
+            motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        }
+
+        leftTop.setTargetPosition(leftTop.getCurrentPosition() + tickDiff);
+        rightTop.setTargetPosition(rightTop.getCurrentPosition() + tickDiff);
+
+        leftBottom.setTargetPosition(leftBottom.getCurrentPosition() - tickDiff);
+        rightBottom.setTargetPosition(rightBottom.getCurrentPosition() - tickDiff);
+
+        setPower(power);
+
+        while (leftTop.isBusy() || rightTop.isBusy() || leftBottom.isBusy() || rightBottom.isBusy()) {
+            Thread.sleep(100);
+        }
+
+        setPower(0);
+
+        for (DcMotor motor: motors)
+        {
+            motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        }
     }
 
     public void setPower(double power)
@@ -209,7 +244,7 @@ public class DiffSwerve {
 
     //endregion
 
-    //region Set Power Methods
+    //region Gamepad Set Power Methods
     /**
      * Used to call both functions for setting the motor powers of each pod
      */
