@@ -14,10 +14,10 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 public class DiffSwerve {
     public DcMotor leftTop, leftBottom, rightTop, rightBottom;
     public DcMotor[] motors;
-
-    public static final double TICKS_TO_DEGREES = 0; // 360 / ticks per rotation
-    public static final double POD_GEAR_RATIO = 0;
-    public static final double POD_ROTATION_TO_WHEEL_RATIO = 0;
+    //motor spec page: https://www.gobilda.com/5203-series-yellow-jacket-planetary-gear-motor-19-2-1-ratio-24mm-length-8mm-rex-shaft-312-rpm-3-3-5v-encoder/
+    public static final double TICKS_TO_DEGREES = 360.0 / 537.7; // 360 / ticks per rotation
+    public static final double POD_GEAR_RATIO = 1;
+    public static final double POD_ROTATION_TO_WHEEL_RATIO = 1;
 
     //Proportional constant (counters current error)
     double Kp = 1;
@@ -25,7 +25,6 @@ public class DiffSwerve {
     double Ki = 1;
     //Derivative constant (fights oscillation)
     double Kd = 1;
-
 
     double lastError = 0;
 
@@ -44,31 +43,52 @@ public class DiffSwerve {
     }
 
     //region Get Position and Rotation Methods
-    public double getLeftPodRotation() {
-        double netTicks = leftTop.getCurrentPosition() + leftBottom.getCurrentPosition() / 2.0;
+    private double getPodAngle(DcMotor topMotor, DcMotor bottomMotor)
+    {
+        double netTicks = topMotor.getCurrentPosition() + bottomMotor.getCurrentPosition() / 2.0;
 
         return (netTicks * TICKS_TO_DEGREES * POD_GEAR_RATIO) % (360);
     }
 
-    public double getRightPodRotation()
-    {
-        double netTicks = rightTop.getCurrentPosition() + rightBottom.getCurrentPosition() / 2.0;
+    public double getLeftPodAngle() {
+        return getPodAngle(leftTop, leftBottom);
+    }
 
-        return (netTicks * TICKS_TO_DEGREES * POD_GEAR_RATIO) % (360);
+    public double getRightPodAngle()
+    {
+        return getPodAngle(rightTop, rightBottom);
+    }
+
+    private double getPodPosition(DcMotor topMotor, DcMotor bottomMotor)
+    {
+        double netTicks = topMotor.getCurrentPosition() - bottomMotor.getCurrentPosition();
+
+        return netTicks * TICKS_TO_DEGREES * POD_GEAR_RATIO * POD_ROTATION_TO_WHEEL_RATIO;
     }
 
     public double getLeftPodPosition()
     {
-        double netTicks = leftBottom.getCurrentPosition() - leftTop.getCurrentPosition();
-
-        return netTicks * TICKS_TO_DEGREES * POD_GEAR_RATIO * POD_ROTATION_TO_WHEEL_RATIO;
+        return getPodPosition(leftTop, leftBottom);
     }
 
     public double getRightPodPosition()
     {
-        double netTicks = rightBottom.getCurrentPosition() - rightTop.getCurrentPosition();
+        return getPodPosition(rightTop, rightBottom);
+    }
 
-        return netTicks * TICKS_TO_DEGREES * POD_GEAR_RATIO * POD_ROTATION_TO_WHEEL_RATIO;
+    private double getAngularError(double targetDegrees, double angle)
+    {
+        return (targetDegrees - angle) % 360;
+    }
+
+    public double getLeftAngularError(double targetDegrees)
+    {
+        return getAngularError(targetDegrees, getLeftPodAngle());
+    }
+
+    public double getRightAngularError(double targetDegrees)
+    {
+        return getAngularError(targetDegrees, getRightPodAngle());
     }
     //endregion
 
@@ -95,6 +115,35 @@ public class DiffSwerve {
     {
         rightTop.setPower(power);
         rightBottom.setPower(power);
+    }
+
+    private void setPodAngle(double angle, double power, DcMotor topMotor, DcMotor bottomMotor) throws InterruptedException {
+        double degreeChange = getPodAngle(topMotor, bottomMotor) - angle;
+        double tickChange = degreeChange / TICKS_TO_DEGREES / POD_GEAR_RATIO / POD_ROTATION_TO_WHEEL_RATIO;
+
+        topMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        bottomMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        topMotor.setTargetPosition((int) Math.round(tickChange));
+        bottomMotor.setTargetPosition((int) Math.round(tickChange));
+
+        topMotor.setPower(power);
+        bottomMotor.setPower(power);
+
+        while (topMotor.isBusy() || bottomMotor.isBusy())
+        {
+            Thread.sleep(100);
+        }
+
+        topMotor.setPower(power);
+    }
+
+    public void setLeftAngle(double angle, double power) throws InterruptedException {
+        setPodAngle(angle, power, leftTop, leftBottom);
+    }
+
+    public void setRightAngle(double angle, double power) throws InterruptedException {
+        setPodAngle(angle, power, leftTop, leftBottom);
     }
 
     public void setPower(double power)
@@ -169,58 +218,38 @@ public class DiffSwerve {
         SetPod2Powers(gamepad1);
     }
 
-    public double getLeftRotationalError(double targetDegrees)
+    private void SetPodPowers(Gamepad gamepad1, DcMotor topMotor, DcMotor bottomMotor)
     {
-        return (targetDegrees - getLeftPodRotation()) % 360;
-    }
+        double inputAngle = getStickAngle(gamepad1);
 
-    public double getRightRotationalError(double targetDegrees)
-    {
-        return (targetDegrees - getRightPodRotation()) % 360;
+        double e = getLeftAngularError(inputAngle);
+        //diff.GetPIDValue(e)
+        double inputMagnitude = StickMagnitude(gamepad1.left_stick_x, gamepad1.left_stick_y);
+
+        double m1 = inputMagnitude + GetPIDValue(e);
+        double m2 = -inputMagnitude + GetPIDValue(e);
+
+        double[] pows = NormalizeScale(m1, m2);
+
+        double m1Power = pows[0];
+        double m2Power = pows[1];
+
+        topMotor.setPower(m1Power);
+        bottomMotor.setPower(m2Power);
     }
 
     /**
      * Set the power of each motor for Pod 1
      */
     public void SetPod1Powers(Gamepad gamepad1){
-        double inputAngle = getStickAngle(gamepad1);
-
-        double e = getLeftRotationalError(inputAngle);
-        //diff.GetPIDValue(e)
-        double inputMagnitude = StickMagnitude(gamepad1.left_stick_x, gamepad1.left_stick_y);
-
-        double m1 = inputMagnitude + GetPIDValue(e);
-        double m2 = -inputMagnitude + GetPIDValue(e);
-
-        double[] pows = NormalizeScale(m1, m2);
-
-        double m1Power = pows[0];
-        double m2Power = pows[1];
-
-        leftTop.setPower(m1Power);
-        leftBottom.setPower(m2Power);
+        SetPodPowers(gamepad1, leftTop, leftBottom);
     }
 
     /**
-     * Set the power of each motor for Pod 1
+     * Set the power of each motor for Pod 2
      */
     private void SetPod2Powers(Gamepad gamepad1){
-        double inputAngle = getStickAngle(gamepad1);
-
-        double e = getRightRotationalError(inputAngle);
-        //diff.GetPIDValue(e)
-        double inputMagnitude = StickMagnitude(gamepad1.left_stick_x, gamepad1.left_stick_y);
-
-        double m1 = inputMagnitude + GetPIDValue(e);
-        double m2 = -inputMagnitude + GetPIDValue(e);
-
-        double[] pows = NormalizeScale(m1, m2);
-
-        double m1Power = pows[0];
-        double m2Power = pows[1];
-
-        rightTop.setPower(m1Power);
-        rightBottom.setPower(m2Power);
+        SetPodPowers(gamepad1, rightTop, rightBottom);
     }
     //endregion
 }
