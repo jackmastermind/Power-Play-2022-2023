@@ -17,8 +17,7 @@ public class DiffDrive extends LinearOpMode
 
     DiffSwerve diff = new DiffSwerve();
 
-    public void runOpMode()
-    {
+    public void runOpMode() throws InterruptedException {
         diff.initialize(hardwareMap);
 
         ElapsedTime runtime = new ElapsedTime();
