@@ -253,17 +253,28 @@ public class DiffSwerve {
         SetPod2Powers(gamepad1);
     }
 
-    private void SetPodPowers(Gamepad gamepad1, DcMotor topMotor, DcMotor bottomMotor)
+    private void SetPodPowers(Gamepad gamepad1, DcMotor topMotor, DcMotor bottomMotor, boolean isLeft)
     {
         double inputAngle = getStickAngle(gamepad1);
 
-        double e = getLeftAngularError(inputAngle);
-        //diff.GetPIDValue(e)
-        double inputMagnitude = StickMagnitude(gamepad1.left_stick_x, gamepad1.left_stick_y);
+        double e = getLeftAngularError(inputAngle); //Get the error amount (desired value - current value)
+        double inputMagnitude = StickMagnitude(gamepad1.left_stick_x, gamepad1.left_stick_y); //Get the input magnitude
 
-        double m1 = inputMagnitude + GetPIDValue(e);
-        double m2 = -inputMagnitude + GetPIDValue(e);
+        double m1 = 0;
+        double m2 = 0;
 
+        //Add the different acceleration amounts for the Wheel, POD, and tank turning into one value.
+        if(isLeft) {
+            //Since tank rotation requires powering both WHEELS seperatly, we set the power of each motor separately for each left and right pod.
+            m1 = inputMagnitude + GetPIDValue(e) + gamepad1.right_stick_x;
+            m2 = -inputMagnitude + GetPIDValue(e) - gamepad1.right_stick_x;
+        }
+        else{
+            m1 = inputMagnitude + GetPIDValue(e) - gamepad1.right_stick_x;
+            m2 = -inputMagnitude + GetPIDValue(e) + gamepad1.right_stick_x;
+        }
+
+        //Scale the acceleration amount to between -1 to 1
         double[] pows = NormalizeScale(m1, m2);
 
         double m1Power = pows[0];
@@ -277,14 +288,14 @@ public class DiffSwerve {
      * Set the power of each motor for Pod 1
      */
     public void SetPod1Powers(Gamepad gamepad1){
-        SetPodPowers(gamepad1, leftTop, leftBottom);
+        SetPodPowers(gamepad1, leftTop, leftBottom, true);
     }
 
     /**
      * Set the power of each motor for Pod 2
      */
     private void SetPod2Powers(Gamepad gamepad1){
-        SetPodPowers(gamepad1, rightTop, rightBottom);
+        SetPodPowers(gamepad1, rightTop, rightBottom, false);
     }
     //endregion
 }
