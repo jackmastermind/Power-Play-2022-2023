@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -32,12 +33,13 @@ public class DiffSwerve {
     public void initialize(HardwareMap hardwareMap) throws InterruptedException {
         leftTop = hardwareMap.get(DcMotor.class, "leftTop");
         leftBottom = hardwareMap.get(DcMotor.class, "leftBottom");
+        leftBottom.setDirection(DcMotorSimple.Direction.REVERSE);
         rightTop = hardwareMap.get(DcMotor.class, "rightTop");
         rightBottom = hardwareMap.get(DcMotor.class, "rightBottom");
         motors = new DcMotor[] {leftTop, leftBottom, rightTop, rightBottom};
         //TODO: SOMETHING TO ZERO THE PODS HERE
-        setLeftAngle(0, 0.5);
-        setRightAngle(0, 0.5);
+        //setLeftAngle(0, 0.5);
+        //setRightAngle(0, 0.5);
 
         for (DcMotor motor: motors) {
             motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

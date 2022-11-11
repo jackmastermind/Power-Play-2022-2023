@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @TeleOp(name="Diff Drive")
 public class DiffDrive extends LinearOpMode
 {
-    HardwareMap_Master masterHardware = new HardwareMap_Master();
+    //HardwareMap_Master masterHardware = new HardwareMap_Master();
 
     double M1LPower = 0;
     double M1RPower = 0;
@@ -21,11 +21,11 @@ public class DiffDrive extends LinearOpMode
         diff.initialize(hardwareMap);
 
         ElapsedTime runtime = new ElapsedTime();
-        masterHardware.init(hardwareMap);
-        MotorRecorder recorder = new MotorRecorder(runtime, masterHardware, 0.01, telemetry);
+        //masterHardware.init(hardwareMap);
+        //MotorRecorder recorder = new MotorRecorder(runtime, masterHardware, 0.01, telemetry);
 
         //RESET MOTOR ENCODER THING BRUH
-        masterHardware.spool.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //masterHardware.spool.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         waitForStart();
         runtime.reset();
@@ -39,25 +39,25 @@ public class DiffDrive extends LinearOpMode
             if (gamepad1.right_trigger >= 0.75)
             {
                 telemetry.addData("DUMPING MODE", "active");
-                String filepath = masterHardware.filenameSelect(this);
-                if (filepath != null)
+                //String filepath = masterHardware.filenameSelect(this);
+                /*if (filepath != null)
                 {
                     telemetry.addData("DUMPING MODE", "dumping...");
                     recorder.dumpData(filepath);
                     telemetry.addData("DUMPING MODE", "complete!");
-                }
+                }*/
             }
 
             //region Set Motor Power and Telemetry
             //SET MOTOR POWER
-            masterHardware.frontLeft.setPower(M1LPower);
+            /*masterHardware.frontLeft.setPower(M1LPower);
             masterHardware.frontRight.setPower(M1RPower);
             masterHardware.backLeft.setPower(M2LPower);
             masterHardware.backRight.setPower(M2RPower);
 
-            recorder.updateData();
+            recorder.updateData();*/
 
-            telemetry.addData("Spool Position ", masterHardware.spool.getCurrentPosition());
+            //telemetry.addData("Spool Position ", masterHardware.spool.getCurrentPosition());
             //telemetry.addData("Right X Axis", inputRX);
             //telemetry.addData("Left Y Axis", inputLY);
             telemetry.addData("Motor 1 Left", M1LPower);
