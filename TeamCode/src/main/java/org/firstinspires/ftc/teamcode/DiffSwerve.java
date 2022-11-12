@@ -132,16 +132,16 @@ public class DiffSwerve {
         double degreeChange = getPodAngle(topMotor, bottomMotor) - angle;
         double tickChange = degreeChange / TICKS_TO_DEGREES / POD_GEAR_RATIO / POD_ROTATION_TO_WHEEL_RATIO;
 
-        topMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        bottomMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
         topMotor.setTargetPosition((int) Math.round(tickChange));
         bottomMotor.setTargetPosition((int) Math.round(tickChange));
+
+        topMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        bottomMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         topMotor.setPower(power);
         bottomMotor.setPower(power);
 
-        while (topMotor.isBusy() || bottomMotor.isBusy())
+        while (topMotor.isBusy() && bottomMotor.isBusy())
         {
             Thread.sleep(100);
         }
