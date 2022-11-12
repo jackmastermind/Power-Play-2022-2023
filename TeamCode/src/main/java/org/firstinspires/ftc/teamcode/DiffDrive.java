@@ -64,9 +64,14 @@ public class DiffDrive extends LinearOpMode
             telemetry.addData("leftBottom", diff.leftBottom.getPower());
             telemetry.addData("leftTop ticks", diff.leftTop.getCurrentPosition());
             telemetry.addData("leftBottom ticks", diff.leftBottom.getCurrentPosition());
-            telemetry.addData("lastError", diff.lastError);
+            telemetry.addLine();
             telemetry.addData("leftAngle", diff.getLeftPodAngle());
+            telemetry.addLine();
+            telemetry.addData("lastError", diff.lastError);
+            telemetry.addData("PID Value", diff.GetPIDValue(diff.getLeftAngularError(diff.getStickAngle(gamepad1))));
+            telemetry.addLine();
             telemetry.addData("stickAngle", diff.getStickAngle(gamepad1));
+            telemetry.addData("stickMagnitude", diff.StickMagnitude(gamepad1.left_stick_x, gamepad1.left_stick_y));
 
             telemetry.update();
             //endregion
