@@ -31,6 +31,8 @@ public class DiffSwerve {
     //Derivative constant (fights oscillation)
     double Kd = 1;
 
+    double integral = 0;
+
     public double lastError = 0;
 
     public void initialize(HardwareMap hardwareMap) throws InterruptedException {
@@ -207,9 +209,9 @@ public class DiffSwerve {
      * @param error Difference between desired and current value
      * @return Correction value
      */
-    public double GetPIDValue(double error){
+    public double GetPIDValue(double error, double dt){
         double proportion = Kp * error;
-        double integral = Ki * error;
+        integral += Ki * error * dt; //TODO multiply by a delta time value
         double derivative = Kd * (error - lastError);
         lastError = error;
 
@@ -253,12 +255,12 @@ public class DiffSwerve {
     /**
      * Used to call both functions for setting the motor powers of each pod
      */
-    private void SetPowers(Gamepad gamepad1){
-        SetPod1Powers(gamepad1);
-        SetPod2Powers(gamepad1);
+    private void SetPowers(Gamepad gamepad1, double dt){
+        SetPod1Powers(gamepad1, dt);
+        SetPod2Powers(gamepad1, dt);
     }
 
-    private void SetPodPowers(Gamepad gamepad1, DcMotor topMotor, DcMotor bottomMotor, boolean isLeft)
+    private void SetPodPowers(Gamepad gamepad1, DcMotor topMotor, DcMotor bottomMotor, boolean isLeft, double dt)
     {
         double inputAngle = getStickAngle(gamepad1);
 
@@ -273,8 +275,8 @@ public class DiffSwerve {
 
         //Add the different acceleration amounts for the Wheel, POD, and tank turning into one value.
         //Since tank rotation requires powering both WHEELS seperatly, we set the power of each motor separately for each left and right pod.
-        m1 = inputMagnitude + GetPIDValue(e) + (gamepad1.right_stick_x * rightStickMultiplier);
-        m2 = -inputMagnitude + GetPIDValue(e) - (gamepad1.right_stick_x * rightStickMultiplier) ;
+        m1 = inputMagnitude + GetPIDValue(e, dt) + (gamepad1.right_stick_x * rightStickMultiplier);
+        m2 = -inputMagnitude + GetPIDValue(e, dt) - (gamepad1.right_stick_x * rightStickMultiplier) ;
 
 
         //Scale the acceleration amount to between -1 to 1
@@ -294,15 +296,15 @@ public class DiffSwerve {
     /**
      * Set the power of each motor for Pod 1
      */
-    public void SetPod1Powers(Gamepad gamepad1){
-        SetPodPowers(gamepad1, leftTop, leftBottom, true);
+    public void SetPod1Powers(Gamepad gamepad1, double dt){
+        SetPodPowers(gamepad1, leftTop, leftBottom, true, dt);
     }
 
     /**
      * Set the power of each motor for Pod 2
      */
-    private void SetPod2Powers(Gamepad gamepad1){
-        SetPodPowers(gamepad1, rightTop, rightBottom, false);
+    private void SetPod2Powers(Gamepad gamepad1, double dt){
+        SetPodPowers(gamepad1, rightTop, rightBottom, false, dt);
     }
     //endregion
 }
