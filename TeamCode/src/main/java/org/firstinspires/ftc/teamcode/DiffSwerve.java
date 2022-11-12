@@ -17,9 +17,12 @@ public class DiffSwerve {
     public DcMotor[] motors;
     //motor spec page: https://www.gobilda.com/5203-series-yellow-jacket-planetary-gear-motor-19-2-1-ratio-24mm-length-8mm-rex-shaft-312-rpm-3-3-5v-encoder/
     public static final double TICKS_TO_DEGREES = 360.0 / 537.7; // 360 / ticks per rotation
-    public static final double POD_GEAR_RATIO = 1;
-    public static final double POD_ROTATION_TO_WHEEL_RATIO = 1;
-    public static final double WHEEL_CIRCUMFERENCE = 1;
+    public static final double POD_GEAR_RATIO = 17.0 / 68.0;
+    public static final double POD_ROTATION_TO_WHEEL_RATIO = 68.0 / 15;
+    public static final double WHEEL_CIRCUMFERENCE = Math.PI * 4;
+    //BIG GEAR: 68 teeth
+    //LITTLE GEAR: 15
+    //EXTERNAL GEAR: 17
 
     //Proportional constant (counters current error)
     double Kp = 1;
@@ -28,7 +31,7 @@ public class DiffSwerve {
     //Derivative constant (fights oscillation)
     double Kd = 1;
 
-    double lastError = 0;
+    public double lastError = 0;
 
     public void initialize(HardwareMap hardwareMap) throws InterruptedException {
         leftTop = hardwareMap.get(DcMotor.class, "leftTop");
@@ -84,7 +87,7 @@ public class DiffSwerve {
 
     private double getAngularError(double targetDegrees, double angle)
     {
-        return (targetDegrees - angle) % 360;
+        return ((targetDegrees - angle) % 360) / 180;
     }
 
     public double getLeftAngularError(double targetDegrees)
@@ -281,8 +284,8 @@ public class DiffSwerve {
         double m2Power = pows[1];
 
         //FOR TESTING (DELETE LATER)
-        m1Power *= 0.2;
-        m2Power *= 0.2;
+        m1Power *= 0.6;
+        m2Power *= 0.6;
 
         topMotor.setPower(m1Power);
         bottomMotor.setPower(m2Power);

@@ -60,10 +60,13 @@ public class DiffDrive extends LinearOpMode
             //telemetry.addData("Spool Position ", masterHardware.spool.getCurrentPosition());
             //telemetry.addData("Right X Axis", inputRX);
             //telemetry.addData("Left Y Axis", inputLY);
-            telemetry.addData("Motor 1 Left", M1LPower);
-            telemetry.addData("Motor 1 Right", M1RPower);
-            telemetry.addData("Motor 2 Left", M2LPower);
-            telemetry.addData("Motor 2 Right", M2RPower);
+            telemetry.addData("leftTop", diff.leftTop.getPower());
+            telemetry.addData("leftBottom", diff.leftBottom.getPower());
+            telemetry.addData("leftTop ticks", diff.leftTop.getCurrentPosition());
+            telemetry.addData("leftBottom ticks", diff.leftBottom.getCurrentPosition());
+            telemetry.addData("lastError", diff.lastError);
+            telemetry.addData("leftAngle", diff.getLeftPodAngle());
+            telemetry.addData("stickAngle", diff.getStickAngle(gamepad1));
 
             telemetry.update();
             //endregion
