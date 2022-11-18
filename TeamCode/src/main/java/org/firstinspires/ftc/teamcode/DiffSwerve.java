@@ -17,7 +17,7 @@ public class DiffSwerve {
     public DcMotor[] motors;
     //motor spec page: https://www.gobilda.com/5203-series-yellow-jacket-planetary-gear-motor-19-2-1-ratio-24mm-length-8mm-rex-shaft-312-rpm-3-3-5v-encoder/
     public static final double TICKS_TO_DEGREES = 360.0 / 537.7; // 360 / ticks per rotation
-    public static final double POD_GEAR_RATIO = 17.0 / 68.0;
+    public static final double POD_GEAR_RATIO = 17.0 / 68.0; //TODO: FLIP
     public static final double POD_ROTATION_TO_WHEEL_RATIO = 68.0 / 15;
     public static final double WHEEL_CIRCUMFERENCE = Math.PI * 4;
     //BIG GEAR: 68 teeth
@@ -25,7 +25,7 @@ public class DiffSwerve {
     //EXTERNAL GEAR: 17
 
     //Proportional constant (counters current error)
-    double Kp = 1;
+    double Kp = 6;
     //Integral constant (counters cumulated error)
     double Ki = 1;
     //Derivative constant (fights oscillation)
@@ -56,6 +56,7 @@ public class DiffSwerve {
     //region Get Position and Rotation Methods
     private double getPodAngle(DcMotor topMotor, DcMotor bottomMotor)
     {
+        //TODO: PARENTHESES?
         double netTicks = topMotor.getCurrentPosition() + bottomMotor.getCurrentPosition() / 2.0;
 
         return (netTicks * TICKS_TO_DEGREES * POD_GEAR_RATIO) % (360);
@@ -89,7 +90,7 @@ public class DiffSwerve {
 
     private double getAngularError(double targetDegrees, double angle)
     {
-        return ((targetDegrees - angle) % 360) / 180;
+        return ((targetDegrees - angle) % 360) / 180; //TODO: THIS IS SCREWED UP
     }
 
     public double getLeftAngularError(double targetDegrees)
@@ -263,9 +264,9 @@ public class DiffSwerve {
     private void SetPodPowers(Gamepad gamepad1, DcMotor topMotor, DcMotor bottomMotor, boolean isLeft, double dt)
     {
         double inputAngle = getStickAngle(gamepad1);
-
+        //TODO: FOR OTHER POD
         double e = getLeftAngularError(inputAngle); //Get the error amount (desired value - current value)
-        double inputMagnitude = StickMagnitude(gamepad1.left_stick_x, gamepad1.left_stick_y); //Get the input magnitude
+        double inputMagnitude = 0; //StickMagnitude(gamepad1.left_stick_x, gamepad1.left_stick_y); //Get the input magnitude
 
         double m1 = 0;
         double m2 = 0;
@@ -276,7 +277,7 @@ public class DiffSwerve {
         //Add the different acceleration amounts for the Wheel, POD, and tank turning into one value.
         //Since tank rotation requires powering both WHEELS seperatly, we set the power of each motor separately for each left and right pod.
         m1 = inputMagnitude + GetPIDValue(e, dt) + (gamepad1.right_stick_x * rightStickMultiplier);
-        m2 = -inputMagnitude + GetPIDValue(e, dt) - (gamepad1.right_stick_x * rightStickMultiplier) ;
+        m2 = -inputMagnitude + GetPIDValue(e, dt) - (gamepad1.right_stick_x * rightStickMultiplier);
 
 
         //Scale the acceleration amount to between -1 to 1
