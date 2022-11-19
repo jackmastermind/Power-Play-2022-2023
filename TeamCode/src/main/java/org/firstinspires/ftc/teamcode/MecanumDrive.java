@@ -56,7 +56,7 @@ public class MecanumDrive extends LinearOpMode
             double susanSpeed = 1;
             double spoolSpeed = 1;
             double armSpeed = 1;
-            double wristSpeed = 10;
+            double wristSpeed = -0.1;
 
             double susanInput = gamepad2.right_trigger - gamepad2.left_trigger;
             double spoolInput = (gamepad2.dpad_up ? 1 : 0) - (gamepad2.dpad_down ? 1 : 0);
@@ -87,12 +87,12 @@ public class MecanumDrive extends LinearOpMode
             {
                 if (clawOpen)
                 {
-                    masterHardware.clawServo.setPosition(0);
+                    masterHardware.clawServo.setPosition(0.5);
                     clawOpen = false;
                 }
                 else
                 {
-                    masterHardware.clawServo.setPosition(180);
+                    masterHardware.clawServo.setPosition(0.7);
                     clawOpen = true;
                 }
             }

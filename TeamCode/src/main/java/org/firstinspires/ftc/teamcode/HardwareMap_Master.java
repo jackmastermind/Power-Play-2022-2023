@@ -117,11 +117,6 @@ public class HardwareMap_Master
             m.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             m.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         }
-
-        for (Servo servo: servos)
-        {
-            servo.setPosition(0);
-        }
     }
     
     public String filenameSelect(LinearOpMode currentOpMode)
