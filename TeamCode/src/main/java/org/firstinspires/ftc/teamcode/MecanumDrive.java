@@ -71,7 +71,7 @@ public class MecanumDrive extends LinearOpMode
 
             //endregion
 
-            //region ------------------------------- Setting Power -------------------------------
+            //region ----------------------------- Setting Power -----------------------------
             masterHardware.frontLeft.setPower(flPower);
             masterHardware.frontRight.setPower(frPower);
             masterHardware.backLeft.setPower(blPower);
@@ -100,6 +100,7 @@ public class MecanumDrive extends LinearOpMode
 
             recorder.updateData();
 
+            //region ----------------------------- Telemetry ---------------------------------
             telemetry.addData("fl", flPower);
             telemetry.addData("fr", frPower);
             telemetry.addData("bl", blPower);
@@ -114,6 +115,7 @@ public class MecanumDrive extends LinearOpMode
             telemetry.addData("spool position", masterHardware.spool.getCurrentPosition());
 
             telemetry.update();
+            //endregion
         }
     }
 }
