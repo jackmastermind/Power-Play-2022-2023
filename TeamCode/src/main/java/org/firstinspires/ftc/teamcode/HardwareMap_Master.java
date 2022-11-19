@@ -56,12 +56,11 @@ public class HardwareMap_Master
     public DcMotor susan;       // Lazy susan wheel
     public DcMotor spool;      // Linear slide motor 1
     public DcMotor arm;      // Linear slide motor 2
-    public DcMotor clawWrist;   // DC Motor on claw
 
+    public Servo clawWrist;
     public Servo clawServo;     // Servo to open & close claw
 
     public DcMotor[] motors;
-    public DcMotor[] slideMotors;
     public Servo[] servos;
 
     //OLD DATA
@@ -91,8 +90,8 @@ public class HardwareMap_Master
             susan = hwMap.get(DcMotor.class, "susan");
             spool = hwMap.get(DcMotor.class, "spool");
             arm = hwMap.get(DcMotor.class, "arm");
-            clawWrist = hwMap.get(DcMotor.class, "clawWrist");
 
+            clawWrist = hwMap.get(Servo.class, "clawWrist");
             clawServo = hwMap.get(Servo.class, "clawServo");
         }
 
@@ -102,9 +101,8 @@ public class HardwareMap_Master
         }
         else {
             motors = new DcMotor[] {frontLeft, frontRight, backLeft, backRight,
-                    susan, spool, arm, clawWrist};
-            slideMotors = new DcMotor[] {spool, arm};
-            servos = new Servo[] {clawServo};
+                    susan, spool, arm};
+            servos = new Servo[] {clawWrist, clawServo};
         }
 
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
