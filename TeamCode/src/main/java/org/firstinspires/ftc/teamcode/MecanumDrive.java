@@ -12,9 +12,14 @@ public class MecanumDrive extends LinearOpMode
     public void runOpMode()
     {
         ElapsedTime runtime = new ElapsedTime();
-        boolean clawOpen = false;
+        boolean clawOpen = true;
+        boolean aDown = false;
         masterHardware.init(hardwareMap);
+        double wristTarget = masterHardware.clawWrist.getPosition();
         MotorRecorder recorder = new MotorRecorder(runtime, masterHardware, 0.01, telemetry);
+
+        masterHardware.clawWrist.setPosition(wristTarget);
+        masterHardware.clawServo.setPosition(0);
 
         waitForStart();
         runtime.reset();
@@ -56,18 +61,27 @@ public class MecanumDrive extends LinearOpMode
             double susanSpeed = 1;
             double spoolSpeed = 1;
             double armSpeed = 1;
-            double wristSpeed = -0.1;
+            double wristSpeed = -Math.pow(0.01, 1/3.0);
 
             double susanInput = gamepad2.right_trigger - gamepad2.left_trigger;
             double spoolInput = (gamepad2.dpad_up ? 1 : 0) - (gamepad2.dpad_down ? 1 : 0);
             double armInput = gamepad2.left_stick_y;
             double wristInput = gamepad2.right_stick_y;
-            boolean clawServoInput = gamepad2.a;
 
             double susanPower = susanInput * susanSpeed;
             double spoolPower = spoolInput * spoolSpeed;
             double armPower = armInput * armSpeed;
-            double wristPower = wristSpeed * wristInput;
+
+            wristTarget += Math.pow(wristSpeed * wristInput, 3);
+
+            if (wristTarget > 1)
+            {
+                wristTarget = 1;
+            }
+            else if (wristTarget < 0)
+            {
+                wristTarget = 0;
+            }
 
             //endregion
 
@@ -81,20 +95,24 @@ public class MecanumDrive extends LinearOpMode
             masterHardware.spool.setPower(spoolPower);
             masterHardware.arm.setPower(armPower);
 
-            masterHardware.clawWrist.setPosition(masterHardware.clawWrist.getPosition() + wristPower);
+            masterHardware.clawWrist.setPosition(wristTarget);
 
-            if (clawServoInput)
+            if (gamepad2.a && !aDown)
             {
+                aDown = true;
                 if (clawOpen)
                 {
-                    masterHardware.clawServo.setPosition(0.5);
+                    masterHardware.clawServo.setPosition(0.4);
                     clawOpen = false;
                 }
                 else
                 {
-                    masterHardware.clawServo.setPosition(0.7);
+                    masterHardware.clawServo.setPosition(0);
                     clawOpen = true;
                 }
+            }
+            else if (!gamepad2.a){
+                aDown = false;
             }
 
             //endregion
@@ -110,11 +128,13 @@ public class MecanumDrive extends LinearOpMode
             telemetry.addData("susan", susanPower);
             telemetry.addData("spool", spoolPower);
             telemetry.addData("arm", armPower);
-            telemetry.addData("wrist", wristPower);
             telemetry.addLine();
-            telemetry.addData("servo position", masterHardware.clawServo.getPosition());
-            telemetry.addData("spool position", masterHardware.spool.getCurrentPosition());
-
+            telemetry.addData("claw position", masterHardware.clawServo.getPosition());
+            telemetry.addData("wristTarget", wristTarget);
+            telemetry.addData("wrist position", masterHardware.clawWrist.getPosition());
+            telemetry.addLine();
+            telemetry.addData("[DEBUG] aDown?", aDown);
+            telemetry.addData("[DEBUG] clawOpen?", clawOpen);
             telemetry.update();
             //endregion
         }
