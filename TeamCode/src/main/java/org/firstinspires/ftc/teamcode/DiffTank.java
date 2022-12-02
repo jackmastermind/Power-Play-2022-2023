@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.teamcode.DiffSwerve.POD_GEAR_RATIO;
+import static org.firstinspires.ftc.teamcode.DiffSwerve.TICKS_TO_DEGREES;
+
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -11,7 +14,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @TeleOp(name="DiffTank")
-@Disabled
 public class DiffTank extends LinearOpMode {
 
     // Declare OpMode members.
@@ -20,8 +22,8 @@ public class DiffTank extends LinearOpMode {
     @Override
     public void runOpMode() {
         //INITIALIZATION CODE
-        DcMotor m1 = hardwareMap.get(DcMotor.class, "motor1");
-        DcMotor m2 = hardwareMap.get(DcMotor.class, "motor2");
+        DcMotor m1 = hardwareMap.get(DcMotor.class, "leftTop");
+        DcMotor m2 = hardwareMap.get(DcMotor.class, "leftBottom");
 
         m1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         m2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -49,12 +51,17 @@ public class DiffTank extends LinearOpMode {
             m2.setPower(m2Power);
 
             telemetry.addData("Status", "Running");
-
+            telemetry.addLine();
             telemetry.addData("m1Power", m1Power);
-            telemetry.addData("m1Ticks:", m1.getCurrentPosition());
-
+            telemetry.addData("m1Ticks", m1.getCurrentPosition());
+            telemetry.addLine();
             telemetry.addData("m2Power", m2Power);
-            telemetry.addData("m2Ticks", m2.getCurrentPosition());
+            telemetry.addData("m2T?icks", m2.getCurrentPosition());
+            telemetry.addLine();
+            int totalTicks = m1.getCurrentPosition() + m2.getCurrentPosition();
+            double degrees = (totalTicks * TICKS_TO_DEGREES * POD_GEAR_RATIO / 2) % 360;
+            telemetry.addData("totalTicks", totalTicks);
+            telemetry.addData("degrees", degrees);
             telemetry.update();
         }
     }
