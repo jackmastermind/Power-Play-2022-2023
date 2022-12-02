@@ -88,8 +88,10 @@ public class MecanumDrive extends LinearOpMode
             //region ----------------------------- Setting Power -----------------------------
             masterHardware.frontLeft.setPower(flPower);
             masterHardware.frontRight.setPower(frPower);
-            masterHardware.backLeft.setPower(blPower);
-            masterHardware.backRight.setPower(brPower);
+            //TODO: currently front wheel only because of mechanical problems.
+
+            // masterHardware.backLeft.setPower(blPower);
+            // masterHardware.backRight.setPower(brPower);
 
             masterHardware.susan.setPower(susanPower);
             masterHardware.spool.setPower(spoolPower);
@@ -122,8 +124,8 @@ public class MecanumDrive extends LinearOpMode
             //region ----------------------------- Telemetry ---------------------------------
             telemetry.addData("fl", flPower);
             telemetry.addData("fr", frPower);
-            telemetry.addData("bl", blPower);
-            telemetry.addData("br", brPower);
+            //telemetry.addData("bl", blPower);
+            //telemetry.addData("br", brPower);
             telemetry.addLine();
             telemetry.addData("susan", susanPower);
             telemetry.addData("spool", spoolPower);
