@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -17,7 +16,7 @@ public class DiffSwerve {
     public DcMotor[] motors;
     //motor spec page: https://www.gobilda.com/5203-series-yellow-jacket-planetary-gear-motor-19-2-1-ratio-24mm-length-8mm-rex-shaft-312-rpm-3-3-5v-encoder/
     public static final double TICKS_TO_DEGREES = 360.0 / 537.7; // 360 / ticks per rotation
-    public static final double POD_GEAR_RATIO = 17.0 / 68.0; //TODO: FLIP
+    public static final double POD_GEAR_RATIO = 17.0 / 68.0;
     public static final double POD_ROTATION_TO_WHEEL_RATIO = 68.0 / 15;
     public static final double WHEEL_CIRCUMFERENCE = Math.PI * 4;
     //BIG GEAR: 68 teeth
@@ -35,16 +34,13 @@ public class DiffSwerve {
 
     public double lastError = 0;
 
-    public void initialize(HardwareMap hardwareMap) throws InterruptedException {
+    public void initialize(HardwareMap hardwareMap) {
         leftTop = hardwareMap.get(DcMotor.class, "leftTop");
         leftBottom = hardwareMap.get(DcMotor.class, "leftBottom");
-        //leftBottom.setDirection(DcMotorSimple.Direction.REVERSE);
         rightTop = hardwareMap.get(DcMotor.class, "rightTop");
         rightBottom = hardwareMap.get(DcMotor.class, "rightBottom");
         motors = new DcMotor[] {leftTop, leftBottom, rightTop, rightBottom};
         //TODO: SOMETHING TO ZERO THE PODS HERE
-        //setLeftAngle(0, 0.5);
-        //setRightAngle(0, 0.5);
 
         for (DcMotor motor: motors) {
             motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -217,7 +213,7 @@ public class DiffSwerve {
      */
     public double GetPIDValue(double error, double dt){
         double proportion = Kp * error;
-        integral += Ki * error * dt; //TODO multiply by a delta time value
+        integral += Ki * error * dt;
         double derivative = Kd * (error - lastError);
         lastError = error;
 
@@ -302,7 +298,7 @@ public class DiffSwerve {
         double m1Power = pows[0];
         double m2Power = pows[1];
 
-        //FOR TESTING (DELETE LATER)
+        //TODO: delete this (for testing right now)
         m1Power *= 0.6;
         m2Power *= 0.6;
 

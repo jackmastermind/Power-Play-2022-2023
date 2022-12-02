@@ -2,30 +2,17 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name="Diff Drive")
 public class DiffDrive extends LinearOpMode
 {
-    //HardwareMap_Master masterHardware = new HardwareMap_Master();
-
-    double M1LPower = 0;
-    double M1RPower = 0;
-    double M2LPower = 0;
-    double M2RPower = 0;
-
     DiffSwerve diff = new DiffSwerve();
 
     public void runOpMode() throws InterruptedException {
         diff.initialize(hardwareMap);
 
         ElapsedTime runtime = new ElapsedTime();
-        //masterHardware.init(hardwareMap);
-        //MotorRecorder recorder = new MotorRecorder(runtime, masterHardware, 0.01, telemetry);
-
-        //RESET MOTOR ENCODER THING BRUH
-        //masterHardware.spool.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         waitForStart();
         runtime.reset();
@@ -67,31 +54,7 @@ public class DiffDrive extends LinearOpMode
             //PUT STUFF HERE
             diff.SetPod1Powers(gamepad1, deltaTime);
 
-            //RECORDING STUFF BUTTONS
-            if (gamepad1.right_trigger >= 0.75)
-            {
-                telemetry.addData("DUMPING MODE", "active");
-                //String filepath = masterHardware.filenameSelect(this);
-                /*if (filepath != null)
-                {
-                    telemetry.addData("DUMPING MODE", "dumping...");
-                    recorder.dumpData(filepath);
-                    telemetry.addData("DUMPING MODE", "complete!");
-                }*/
-            }
-
-            //region Set Motor Power and Telemetry
-            //SET MOTOR POWER
-            /*masterHardware.frontLeft.setPower(M1LPower);
-            masterHardware.frontRight.setPower(M1RPower);
-            masterHardware.backLeft.setPower(M2LPower);
-            masterHardware.backRight.setPower(M2RPower);
-
-            recorder.updateData();*/
-
-            //telemetry.addData("Spool Position ", masterHardware.spool.getCurrentPosition());
-            //telemetry.addData("Right X Axis", inputRX);
-            //telemetry.addData("Left Y Axis", inputLY);
+            //region TELEMETRY
             telemetry.addData("leftTop", diff.leftTop.getPower());
             telemetry.addData("leftBottom", diff.leftBottom.getPower());
             telemetry.addData("leftTop ticks", diff.leftTop.getCurrentPosition());
@@ -111,7 +74,6 @@ public class DiffDrive extends LinearOpMode
 
             telemetry.update();
             //endregion
-
 
             //Set last runtime current runtime
             lastRuntime = runtime.time();
