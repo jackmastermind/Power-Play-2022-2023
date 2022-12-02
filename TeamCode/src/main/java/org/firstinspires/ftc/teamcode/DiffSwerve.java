@@ -38,7 +38,7 @@ public class DiffSwerve {
     public void initialize(HardwareMap hardwareMap) throws InterruptedException {
         leftTop = hardwareMap.get(DcMotor.class, "leftTop");
         leftBottom = hardwareMap.get(DcMotor.class, "leftBottom");
-        leftBottom.setDirection(DcMotorSimple.Direction.REVERSE);
+        //leftBottom.setDirection(DcMotorSimple.Direction.REVERSE);
         rightTop = hardwareMap.get(DcMotor.class, "rightTop");
         rightBottom = hardwareMap.get(DcMotor.class, "rightBottom");
         motors = new DcMotor[] {leftTop, leftBottom, rightTop, rightBottom};
@@ -56,8 +56,7 @@ public class DiffSwerve {
     //region Get Position and Rotation Methods
     private double getPodAngle(DcMotor topMotor, DcMotor bottomMotor)
     {
-        //TODO: PARENTHESES?
-        double netTicks = topMotor.getCurrentPosition() + bottomMotor.getCurrentPosition() / 2.0;
+        double netTicks = (topMotor.getCurrentPosition() + bottomMotor.getCurrentPosition()) / 2.0;
 
         return (netTicks * TICKS_TO_DEGREES * POD_GEAR_RATIO) % (360);
     }
@@ -90,7 +89,13 @@ public class DiffSwerve {
 
     private double getAngularError(double targetDegrees, double angle)
     {
-        return ((targetDegrees - angle) % 360) / 180; //TODO: THIS IS SCREWED UP
+        double output = (targetDegrees - angle) % 360;
+        if (output > 180)
+        {
+            output -= 360;
+        }
+
+        return output / 180;
     }
 
     public double getLeftAngularError(double targetDegrees)
@@ -242,11 +247,15 @@ public class DiffSwerve {
 
     public double getStickAngle(Gamepad gamepad1)
     {
-        double degrees = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x) / Math.PI * 180;
-        if (degrees < 0)
+        if (gamepad1.left_stick_x == 0 && gamepad1.left_stick_y == 0)
         {
-            degrees += 360;
+            return 0;
         }
+
+        double degrees = Math.atan2(gamepad1.left_stick_x, gamepad1.left_stick_y) / Math.PI * 180;
+        degrees += 180;
+        degrees %= 360;
+
         return degrees;
     }
 
@@ -264,20 +273,27 @@ public class DiffSwerve {
     private void SetPodPowers(Gamepad gamepad1, DcMotor topMotor, DcMotor bottomMotor, boolean isLeft, double dt)
     {
         double inputAngle = getStickAngle(gamepad1);
-        //TODO: FOR OTHER POD
-        double e = getLeftAngularError(inputAngle); //Get the error amount (desired value - current value)
-        double inputMagnitude = 0; //StickMagnitude(gamepad1.left_stick_x, gamepad1.left_stick_y); //Get the input magnitude
+        double e;
 
-        double m1 = 0;
-        double m2 = 0;
+        if (isLeft) {
+            e = getLeftAngularError(inputAngle); //Get the error amount (desired value - current value)
+        }
+        else {
+            e = getRightAngularError(inputAngle);
+        }
+
+        double inputMagnitude = StickMagnitude(gamepad1.left_stick_x, gamepad1.left_stick_y); //Get the input magnitude
+
+        double m1;
+        double m2;
 
         //Changes the motor values depending on if this is the left or right wheel.
         int rightStickMultiplier = isLeft ? 1 : -1;
 
         //Add the different acceleration amounts for the Wheel, POD, and tank turning into one value.
-        //Since tank rotation requires powering both WHEELS seperatly, we set the power of each motor separately for each left and right pod.
-        m1 = inputMagnitude + GetPIDValue(e, dt) + (gamepad1.right_stick_x * rightStickMultiplier);
-        m2 = -inputMagnitude + GetPIDValue(e, dt) - (gamepad1.right_stick_x * rightStickMultiplier);
+        //Since tank rotation requires powering both WHEELS separately, we set the power of each motor separately for each left and right pod.
+        m1 = -inputMagnitude + GetPIDValue(e, dt) + (gamepad1.right_stick_x * rightStickMultiplier);
+        m2 = inputMagnitude + GetPIDValue(e, dt) + (gamepad1.right_stick_x * rightStickMultiplier);
 
 
         //Scale the acceleration amount to between -1 to 1
