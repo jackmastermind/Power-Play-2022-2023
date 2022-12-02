@@ -59,14 +59,14 @@ public class MecanumDrive extends LinearOpMode
 
             //region  ------------------------------- Gamepad 2 -------------------------------
             double susanSpeed = 1;
-            double spoolSpeed = 1;
-            double armSpeed   = 0.5;
+            double spoolSpeed = 0.5;
+            double armSpeed   = 0.2;
             double wristSpeed = -Math.pow(0.01, 1/3.0);
 
             double susanInput = gamepad2.right_trigger - gamepad2.left_trigger;
-            double spoolInput = (gamepad2.dpad_up ? 1 : 0) - (gamepad2.dpad_down ? 1 : 0);
+            double spoolInput = gamepad2.right_stick_y;
             double armInput   = gamepad2.left_stick_y;
-            double wristInput = gamepad2.right_stick_y;
+            double wristInput = (gamepad2.dpad_up ? 1 : 0) - (gamepad2.dpad_down ? 1 : 0);
 
             double susanPower = susanInput * susanSpeed;
             double spoolPower = spoolInput * spoolSpeed;

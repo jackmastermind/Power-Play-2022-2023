@@ -96,6 +96,7 @@ public class HardwareMap_Master
             clawServo = hwMap.get(Servo.class, "clawServo");
 
             arm.setDirection(DcMotorSimple.Direction.REVERSE);
+            spool.setDirection(DcMotorSimple.Direction.REVERSE);
         }
 
         if (chassisOnly)
@@ -108,10 +109,10 @@ public class HardwareMap_Master
             servos = new Servo[] {clawWrist, clawServo};
         }
 
-        frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        frontRight.setDirection(DcMotor.Direction.FORWARD);
-        backLeft.setDirection(DcMotor.Direction.REVERSE);
-        backRight.setDirection(DcMotor.Direction.FORWARD);
+        frontLeft.setDirection(DcMotor.Direction.FORWARD);
+        frontRight.setDirection(DcMotor.Direction.REVERSE);
+        backLeft.setDirection(DcMotor.Direction.FORWARD);
+        backRight.setDirection(DcMotor.Direction.REVERSE);
 
         // Hardware Initialization
         for (DcMotor m: motors) {
