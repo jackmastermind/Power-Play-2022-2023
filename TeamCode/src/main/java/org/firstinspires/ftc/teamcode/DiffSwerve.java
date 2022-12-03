@@ -289,7 +289,7 @@ public class DiffSwerve {
         //Add the different acceleration amounts for the Wheel, POD, and tank turning into one value.
         //Since tank rotation requires powering both WHEELS separately, we set the power of each motor separately for each left and right pod.
         m1 = -inputMagnitude + GetPIDValue(e, dt) + (gamepad1.right_stick_x * rightStickMultiplier);
-        m2 = inputMagnitude + GetPIDValue(e, dt) + (gamepad1.right_stick_x * rightStickMultiplier);
+        m2 = inputMagnitude + GetPIDValue(e, dt) - (gamepad1.right_stick_x * rightStickMultiplier);
 
 
         //Scale the acceleration amount to between -1 to 1
