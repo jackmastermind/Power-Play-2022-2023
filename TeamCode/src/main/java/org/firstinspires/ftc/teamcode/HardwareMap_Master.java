@@ -95,8 +95,6 @@ public class HardwareMap_Master
             clawWrist = hwMap.get(Servo.class, "clawWrist");
             clawServo = hwMap.get(Servo.class, "clawServo");
 
-            arm.setDirection(DcMotorSimple.Direction.REVERSE);
-            spool.setDirection(DcMotorSimple.Direction.REVERSE);
         }
 
         if (chassisOnly)

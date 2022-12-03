@@ -15,7 +15,7 @@ public class MecanumDrive extends LinearOpMode
         boolean clawOpen = true;
         boolean aDown = false;
         masterHardware.init(hardwareMap);
-        double wristTarget = masterHardware.clawWrist.getPosition();
+        double wristTarget = 0.9;
         MotorRecorder recorder = new MotorRecorder(runtime, masterHardware, 0.01, telemetry);
 
         masterHardware.clawWrist.setPosition(wristTarget);
@@ -27,9 +27,9 @@ public class MecanumDrive extends LinearOpMode
         while (opModeIsActive()) {
 
             //region  ------------------------------- Gamepad 1 -------------------------------
-            double powerMultiplier = 1;
+            double powerMultiplier = 0.5;
             if (gamepad1.left_bumper) {
-                powerMultiplier = 0.5;
+                powerMultiplier = 0.25;
             }
 
             double inputLX = gamepad1.left_stick_x;
@@ -59,20 +59,20 @@ public class MecanumDrive extends LinearOpMode
 
             //region  ------------------------------- Gamepad 2 -------------------------------
             double susanSpeed = 1;
-            double spoolSpeed = 0.5;
-            double armSpeed   = 0.2;
-            double wristSpeed = -Math.pow(0.01, 1/3.0);
+            double spoolSpeed = 0.4;
+            double armSpeed   = 0.4;
+            double wristSpeed = -0.003;
 
             double susanInput = gamepad2.right_trigger - gamepad2.left_trigger;
             double spoolInput = gamepad2.right_stick_y;
             double armInput   = gamepad2.left_stick_y;
             double wristInput = (gamepad2.dpad_up ? 1 : 0) - (gamepad2.dpad_down ? 1 : 0);
 
-            double susanPower = susanInput * susanSpeed;
-            double spoolPower = spoolInput * spoolSpeed;
-            double armPower   = armInput * armSpeed;
+            double susanPower = Math.pow(susanInput * susanSpeed, 3);
+            double spoolPower = Math.pow(spoolInput * spoolSpeed, 3);
+            double armPower   = Math.pow(armInput * armSpeed, 3);
 
-            wristTarget += Math.pow(wristSpeed * wristInput, 3);
+            wristTarget += wristSpeed * wristInput;
 
             if (wristTarget > 1)
             {
@@ -88,10 +88,8 @@ public class MecanumDrive extends LinearOpMode
             //region ----------------------------- Setting Power -----------------------------
             masterHardware.frontLeft.setPower(flPower);
             masterHardware.frontRight.setPower(frPower);
-            //TODO: currently front wheel only because of mechanical problems.
-
-            // masterHardware.backLeft.setPower(blPower);
-            // masterHardware.backRight.setPower(brPower);
+            masterHardware.backLeft.setPower(blPower);
+            masterHardware.backRight.setPower(brPower);
 
             masterHardware.susan.setPower(susanPower);
             masterHardware.spool.setPower(spoolPower);
@@ -104,7 +102,7 @@ public class MecanumDrive extends LinearOpMode
                 aDown = true;
                 if (clawOpen)
                 {
-                    masterHardware.clawServo.setPosition(0.4);
+                    masterHardware.clawServo.setPosition(0.25);
                     clawOpen = false;
                 }
                 else
@@ -124,8 +122,8 @@ public class MecanumDrive extends LinearOpMode
             //region ----------------------------- Telemetry ---------------------------------
             telemetry.addData("fl", flPower);
             telemetry.addData("fr", frPower);
-            //telemetry.addData("bl", blPower);
-            //telemetry.addData("br", brPower);
+            telemetry.addData("bl", blPower);
+            telemetry.addData("br", brPower);
             telemetry.addLine();
             telemetry.addData("susan", susanPower);
             telemetry.addData("spool", spoolPower);
