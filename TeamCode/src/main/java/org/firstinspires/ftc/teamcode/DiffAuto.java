@@ -27,13 +27,13 @@ public class DiffAuto extends LinearOpMode {
         TelemetryOut telemetryThread = new TelemetryOut();
         telemetryThread.start();
         Thread.sleep(1000);
-        diff.setLeftAngle(90, 0.02);
+        diff.setLeftAngle(90, 0.2);
         Thread.sleep(1000);
-        diff.setLeftAngle(-90, 0.02);
+        diff.setLeftAngle(-90, 0.2);
         Thread.sleep(1000);
-        diff.setLeftAngle(270, 0.02);
+        diff.setLeftAngle(270, 0.2);
         Thread.sleep(1000);
-        diff.setLeftAngle(90, 0.02);
+        diff.setLeftAngle(90, 0.2);
         //RUN ONE TIME CODE HERE
         telemetryThread.interrupt();
 
