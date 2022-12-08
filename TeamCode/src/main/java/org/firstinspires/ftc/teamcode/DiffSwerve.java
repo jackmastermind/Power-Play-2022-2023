@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import static java.lang.Math.atan;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -53,8 +55,14 @@ public class DiffSwerve {
     private double getPodAngle(DcMotor topMotor, DcMotor bottomMotor)
     {
         double netTicks = (topMotor.getCurrentPosition() + bottomMotor.getCurrentPosition()) / 2.0;
+        double degrees = (netTicks * TICKS_TO_DEGREES * POD_GEAR_RATIO) % 360;
 
-        return (netTicks * TICKS_TO_DEGREES * POD_GEAR_RATIO) % (360);
+        if (degrees < 0)
+        {
+            degrees += 360;
+        }
+
+        return degrees / 180;
     }
 
     public double getLeftPodAngle() {
@@ -85,13 +93,13 @@ public class DiffSwerve {
 
     private double getAngularError(double targetDegrees, double angle)
     {
-        double output = (targetDegrees - angle) % 360;
+        double output = (angle - targetDegrees) % 360;
         if (output > 180)
         {
             output -= 360;
         }
 
-        return output / 180;
+        return output;
     }
 
     public double getLeftAngularError(double targetDegrees)
@@ -131,7 +139,7 @@ public class DiffSwerve {
     }
 
     private void setPodAngle(double angle, double power, DcMotor topMotor, DcMotor bottomMotor) throws InterruptedException {
-        double degreeChange = getPodAngle(topMotor, bottomMotor) - angle;
+        double degreeChange = getAngularError(angle, getPodAngle(topMotor, bottomMotor)) * 180;
         double tickChange = degreeChange / TICKS_TO_DEGREES / POD_GEAR_RATIO;
 
         topMotor.setTargetPosition((int) Math.round(tickChange));
@@ -242,16 +250,21 @@ public class DiffSwerve {
         return Math.sqrt(Math.pow(a, 2)+Math.pow(b, 2));
     }
 
-    public double getStickAngle(Gamepad gamepad1)
+    //Should return values in [0, 360], starting with north-clockwise.
+    public static double getStickAngle(Gamepad gamepad1)
     {
         if (gamepad1.left_stick_x == 0 && gamepad1.left_stick_y == 0)
         {
             return 0;
         }
 
-        double degrees = Math.atan2(gamepad1.left_stick_x, gamepad1.left_stick_y) / Math.PI * 180;
-        degrees += 180;
-        degrees %= 360;
+        double degrees = Math.atan2(gamepad1.left_stick_x, -gamepad1.left_stick_y) / Math.PI * 180;
+
+        //This is necessary because Java modulo doesn't correct for negatives.
+        if (degrees < 0)
+        {
+            degrees += 360;
+        }
 
         return degrees;
     }
