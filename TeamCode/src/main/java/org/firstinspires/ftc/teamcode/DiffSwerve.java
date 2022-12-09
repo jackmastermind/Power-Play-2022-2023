@@ -132,7 +132,7 @@ public class DiffSwerve {
 
     private void setPodAngle(double angle, double power, DcMotor topMotor, DcMotor bottomMotor) throws InterruptedException {
         double degreeChange = getPodAngle(topMotor, bottomMotor) - angle;
-        double tickChange = degreeChange / TICKS_TO_DEGREES / POD_GEAR_RATIO / POD_ROTATION_TO_WHEEL_RATIO;
+        double tickChange = degreeChange / TICKS_TO_DEGREES / POD_GEAR_RATIO;
 
         topMotor.setTargetPosition((int) Math.round(tickChange));
         bottomMotor.setTargetPosition((int) Math.round(tickChange));
@@ -148,10 +148,11 @@ public class DiffSwerve {
             Thread.sleep(100);
         }
 
-        topMotor.setPower(power);
+        topMotor.setPower(0);
+        bottomMotor.setPower(0);
 
-        topMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        bottomMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        topMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        bottomMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public void setLeftAngle(double angle, double power) throws InterruptedException {
