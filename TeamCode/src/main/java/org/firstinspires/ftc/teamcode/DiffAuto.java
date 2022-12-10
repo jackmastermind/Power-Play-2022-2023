@@ -26,16 +26,10 @@ public class DiffAuto extends LinearOpMode {
 
         TelemetryOut telemetryThread = new TelemetryOut();
         telemetryThread.start();
-        //Intended behavior: turn right 90 degrees x 4, then turn left 90 degrees.
-        diff.setLeftAngle(90, 0.2);
-        Thread.sleep(1000);
-        diff.setLeftAngle(180, 0.2);
-        Thread.sleep(1000);
-        diff.setLeftAngle(270, 0.2);
-        Thread.sleep(1000);
-        diff.setLeftAngle(0, 0.2);
-        Thread.sleep(1000);
-        diff.setLeftAngle(270, 0.2);
+
+        Thread.sleep(2000);
+        diff.driveInches(DiffSwerve.WHEEL_CIRCUMFERENCE, 0.5);
+
         //RUN ONE TIME CODE HERE
         telemetryThread.interrupt();
 

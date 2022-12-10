@@ -15,7 +15,8 @@ public class DiffSwerve {
     public DcMotor leftTop, leftBottom, rightTop, rightBottom;
     public DcMotor[] motors;
     //motor spec page: https://www.gobilda.com/5203-series-yellow-jacket-planetary-gear-motor-19-2-1-ratio-24mm-length-8mm-rex-shaft-312-rpm-3-3-5v-encoder/
-    public static final double TICKS_TO_DEGREES = 360.0 / 537.7; // 360 / ticks per rotation
+    public static final double TICKS_PER_MOTOR_ROTATION = 537.7;
+    public static final double TICKS_TO_DEGREES = 360.0 / TICKS_PER_MOTOR_ROTATION;
     public static final double POD_GEAR_RATIO = 17.0 / 68.0;
     public static final double POD_ROTATION_TO_WHEEL_RATIO = 68.0 / 15;
     public static final double WHEEL_CIRCUMFERENCE = Math.PI * 4;
@@ -184,20 +185,24 @@ public class DiffSwerve {
     }
 
     public void driveInches(double inches, double power) throws InterruptedException {
-        int tickDiff = (int) Math.round(inches / TICKS_TO_DEGREES / POD_GEAR_RATIO / POD_ROTATION_TO_WHEEL_RATIO / WHEEL_CIRCUMFERENCE);
-
-        for (DcMotor motor: motors)
-        {
-            motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        }
-
+        int tickDiff = (int) Math.round(inches / POD_GEAR_RATIO / POD_ROTATION_TO_WHEEL_RATIO / WHEEL_CIRCUMFERENCE * 537.7);
+        System.out.println("tickDiff: " + tickDiff);
         leftTop.setTargetPosition(leftTop.getCurrentPosition() + tickDiff);
         rightTop.setTargetPosition(rightTop.getCurrentPosition() + tickDiff);
 
         leftBottom.setTargetPosition(leftBottom.getCurrentPosition() - tickDiff);
         rightBottom.setTargetPosition(rightBottom.getCurrentPosition() - tickDiff);
 
-        setPower(power);
+        for (DcMotor motor: motors)
+        {
+            motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        }
+
+        leftTop.setPower(power);
+        rightTop.setPower(power);
+
+        leftBottom.setPower(-power);
+        rightBottom.setPower(-power);
 
         while (leftTop.isBusy() || rightTop.isBusy() || leftBottom.isBusy() || rightBottom.isBusy()) {
             Thread.sleep(100);
