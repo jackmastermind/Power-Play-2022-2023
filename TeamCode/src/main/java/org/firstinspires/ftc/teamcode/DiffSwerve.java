@@ -131,11 +131,31 @@ public class DiffSwerve {
     }
 
     private void setPodAngle(double angle, double power, DcMotor topMotor, DcMotor bottomMotor) throws InterruptedException {
-        double degreeChange = getPodAngle(topMotor, bottomMotor) - angle;
+        double currentAngle = getPodAngle(topMotor, bottomMotor);
+
+        double clockwiseDistance = (angle - currentAngle) % 360;
+        if (clockwiseDistance < 0)
+        {
+            clockwiseDistance += 360;
+        }
+
+        double anticlockwiseDistance = (currentAngle - angle) % 360;
+        if (anticlockwiseDistance < 0)
+        {
+            anticlockwiseDistance += 360;
+            anticlockwiseDistance *= -1;
+        }
+
+        //Take the shorter absolute distance, defaulting to clockwise if they're the same.
+        double degreeChange = Math.abs(clockwiseDistance) > Math.abs(anticlockwiseDistance) ? anticlockwiseDistance: clockwiseDistance;
+
+        System.out.println("clockwiseDistance: " + clockwiseDistance);
+        System.out.println("anticlockwiseDistance: " + anticlockwiseDistance);
+        System.out.println("degreeChange: " + degreeChange);
         double tickChange = degreeChange / TICKS_TO_DEGREES / POD_GEAR_RATIO;
 
-        topMotor.setTargetPosition((int) Math.round(tickChange));
-        bottomMotor.setTargetPosition((int) Math.round(tickChange));
+        topMotor.setTargetPosition(((int) Math.round(tickChange)) + topMotor.getCurrentPosition());
+        bottomMotor.setTargetPosition(((int) Math.round(tickChange)) + bottomMotor.getCurrentPosition());
 
         topMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         bottomMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -160,7 +180,7 @@ public class DiffSwerve {
     }
 
     public void setRightAngle(double angle, double power) throws InterruptedException {
-        setPodAngle(angle, power, leftTop, leftBottom);
+        setPodAngle(angle, power, rightTop, rightBottom);
     }
 
     public void driveInches(double inches, double power) throws InterruptedException {

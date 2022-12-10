@@ -26,18 +26,22 @@ public class DiffAuto extends LinearOpMode {
 
         TelemetryOut telemetryThread = new TelemetryOut();
         telemetryThread.start();
+        //Intended behavior: turn right 90 degrees x 4, then turn left 90 degrees.
         diff.setLeftAngle(90, 0.2);
-        Thread.sleep(2000);
+        Thread.sleep(1000);
         diff.setLeftAngle(180, 0.2);
-        Thread.sleep(5000);
+        Thread.sleep(1000);
         diff.setLeftAngle(270, 0.2);
-        Thread.sleep(5000);
+        Thread.sleep(1000);
+        diff.setLeftAngle(0, 0.2);
+        Thread.sleep(1000);
         diff.setLeftAngle(270, 0.2);
         //RUN ONE TIME CODE HERE
         telemetryThread.interrupt();
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
+            telemetry.addData("status", "complete!");
             telemetry.addData("topTicks", diff.leftTop.getCurrentPosition());
             telemetry.addData("bottomTicks", diff.leftBottom.getCurrentPosition());
             telemetry.addData("Pod Angle", diff.getLeftPodAngle());
@@ -53,6 +57,7 @@ public class DiffAuto extends LinearOpMode {
         public void run() {
             while (opModeIsActive())
             {
+                telemetry.addData("status", "running");
                 telemetry.addData("topTicks", diff.leftTop.getCurrentPosition());
                 telemetry.addData("bottomTicks", diff.leftBottom.getCurrentPosition());
                 telemetry.addData("Pod Angle", diff.getLeftPodAngle());
