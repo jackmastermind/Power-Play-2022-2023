@@ -171,8 +171,8 @@ public class DiffSwerve {
         topMotor.setPower(0);
         bottomMotor.setPower(0);
 
-        topMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        bottomMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        topMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        bottomMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public void setLeftAngle(double angle, double power) throws InterruptedException {
