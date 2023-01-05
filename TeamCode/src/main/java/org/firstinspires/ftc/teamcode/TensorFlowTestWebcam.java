@@ -29,9 +29,14 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import android.os.Environment;
+
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -62,8 +67,7 @@ public class TensorFlowTestWebcam extends LinearOpMode {
      */
     //private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
     //private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/ConeDetectionModel-1.tflite";
-    private static final String TFOD_MODEL_ASSET  = "/sdcard/FIRST/tflitemodels/ConeDetectionModel-1.tflite";
-
+    private static final String TFOD_MODEL_ASSET = Environment.getExternalStorageDirectory().getPath() + "/FIRST/TfliteModels/ConeDetectionModel.tflite";
 
     private static final String[] LABELS = {
             "Black",
@@ -102,6 +106,9 @@ public class TensorFlowTestWebcam extends LinearOpMode {
     public void runOpMode() {
         // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
         // first.
+        File testDir = new File(".");
+        System.out.println("JACK DEBUG: " + Arrays.toString(testDir.listFiles()));
+
         initVuforia();
         initTfod();
 
