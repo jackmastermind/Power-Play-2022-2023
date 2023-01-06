@@ -36,7 +36,7 @@ public class GpsMap extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            //LOOPING CODE HERE
+            //LOOPING CODE HERE eee
 
             /*
             I want to make a sort of map that displays the position of the robot on a grid
