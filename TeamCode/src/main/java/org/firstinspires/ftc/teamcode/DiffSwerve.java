@@ -281,6 +281,22 @@ public class DiffSwerve {
         return degrees;
     }
 
+    public double adjustedAngle(double angle){
+        double output = angle;
+
+        if (Math.abs(output) > 90) {
+            if (output < 0)
+            {
+                output += 180;
+            }
+            else {
+                output -= 180;
+            }
+        }
+
+        return output;
+    }
+
     //endregion
 
     //region Gamepad Set Power Methods
@@ -294,7 +310,9 @@ public class DiffSwerve {
 
     private void SetPodPowers(Gamepad gamepad1, DcMotor topMotor, DcMotor bottomMotor, boolean isLeft, double dt)
     {
-        double inputAngle = getStickAngle(gamepad1);
+        double inputAngle = adjustedAngle(getStickAngle(gamepad1));
+        // Invert the magnitude if the robot needs to be driving backward
+        double magnitudeInverter = getStickAngle(gamepad1) == inputAngle ? 1: -1;
         double e;
 
         if (isLeft) {
@@ -304,7 +322,7 @@ public class DiffSwerve {
             e = getRightAngularError(inputAngle);
         }
 
-        double inputMagnitude = StickMagnitude(gamepad1.left_stick_x, gamepad1.left_stick_y); //Get the input magnitude
+        double inputMagnitude = magnitudeInverter * StickMagnitude(gamepad1.left_stick_x, gamepad1.left_stick_y); //Get the input magnitude
 
         double m1;
         double m2;
