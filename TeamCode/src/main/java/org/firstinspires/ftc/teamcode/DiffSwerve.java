@@ -20,6 +20,8 @@ public class DiffSwerve {
     public static final double POD_GEAR_RATIO = 17.0 / 68.0;
     public static final double POD_ROTATION_TO_WHEEL_RATIO = 68.0 / 15;
     public static final double WHEEL_CIRCUMFERENCE = Math.PI * 4;
+
+    public static final double ROTATION_CIRCUMFERENCE = 0; // robot diagonal diameter * π
     //BIG GEAR: 68 teeth
     //LITTLE GEAR: 15
     //EXTERNAL GEAR: 17
@@ -184,36 +186,142 @@ public class DiffSwerve {
         setPodAngle(angle, power, rightTop, rightBottom);
     }
 
-    public void driveInches(double inches, double power) throws InterruptedException {
-        int tickDiff = (int) Math.round(inches / POD_GEAR_RATIO / POD_ROTATION_TO_WHEEL_RATIO / WHEEL_CIRCUMFERENCE * 537.7);
-        System.out.println("tickDiff: " + tickDiff);
-        leftTop.setTargetPosition(leftTop.getCurrentPosition() + tickDiff);
-        rightTop.setTargetPosition(rightTop.getCurrentPosition() + tickDiff);
-
-        leftBottom.setTargetPosition(leftBottom.getCurrentPosition() - tickDiff);
-        rightBottom.setTargetPosition(rightBottom.getCurrentPosition() - tickDiff);
-
-        for (DcMotor motor: motors)
-        {
-            motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    public void setPodAngles(double angle, double power) throws InterruptedException {
+        class LeftRotate extends Thread {
+            @Override
+            public void run() {
+                try {
+                    setLeftAngle(angle, power);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
-        leftTop.setPower(power);
-        rightTop.setPower(power);
+        class RightRotate extends Thread {
+            @Override
+            public void run() {
+                try {
+                    setRightAngle(angle, power);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
 
-        leftBottom.setPower(-power);
-        rightBottom.setPower(-power);
+        LeftRotate left = new LeftRotate();
+        RightRotate right = new RightRotate();
 
-        while (leftTop.isBusy() || rightTop.isBusy() || leftBottom.isBusy() || rightBottom.isBusy()) {
+        left.start();
+        right.start();
+
+        // Wait for both threads to finish
+        left.join();
+        right.join();
+    }
+
+    private void driveInches(double inches, double power, DcMotor topMotor, DcMotor bottomMotor) throws InterruptedException
+    {
+        int tickDiff = (int) Math.round(inches / POD_GEAR_RATIO / POD_ROTATION_TO_WHEEL_RATIO / WHEEL_CIRCUMFERENCE * 537.7);
+        System.out.println("tickDiff: " + tickDiff);
+        topMotor.setTargetPosition(leftTop.getCurrentPosition() + tickDiff);
+        bottomMotor.setTargetPosition(rightTop.getCurrentPosition() - tickDiff);
+
+        topMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        bottomMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        topMotor.setPower(power);
+        bottomMotor.setPower(-power);
+
+        while (topMotor.isBusy() || bottomMotor.isBusy()) {
             Thread.sleep(100);
         }
 
-        setPower(0);
+        topMotor.setPower(0);
+        bottomMotor.setPower(0);
 
-        for (DcMotor motor: motors)
-        {
-            motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        topMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        bottomMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+
+    public void leftDriveInches(double inches, double power) throws InterruptedException
+    {
+        driveInches(inches, power, leftTop, leftBottom);
+    }
+
+    public void rightDriveInches(double inches, double power) throws InterruptedException
+    {
+        driveInches(inches, power, rightTop, rightBottom);
+    }
+
+    public void driveInches(double inches, double power) throws InterruptedException {
+        class LeftDrive extends Thread {
+            @Override
+            public void run() {
+                try {
+                    leftDriveInches(inches, power);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
+
+        class RightDrive extends Thread {
+            @Override
+            public void run() {
+                try {
+                    rightDriveInches(inches, power);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        LeftDrive left = new LeftDrive();
+        RightDrive right = new RightDrive();
+
+        left.start();
+        right.start();
+
+        // Wait for both threads to finish
+        left.join();
+        right.join();
+    }
+
+    public void rotateChassis(double degrees, double power) throws InterruptedException {
+        double inches = degrees / 360 * ROTATION_CIRCUMFERENCE;
+
+        class LeftTurn extends Thread {
+            @Override
+            public void run() {
+                try {
+                    leftDriveInches(inches, power);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        class RightTurn extends Thread {
+            @Override
+            public void run() {
+                try {
+                    rightDriveInches(-inches, -power);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        LeftTurn left = new LeftTurn();
+        RightTurn right = new RightTurn();
+
+        left.start();
+        right.start();
+
+        // Wait for both threads to finish
+        left.join();
+        right.join();
     }
 
     public void setPower(double power)
