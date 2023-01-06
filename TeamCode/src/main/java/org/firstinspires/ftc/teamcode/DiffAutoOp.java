@@ -32,8 +32,35 @@ public class DiffAutoOp extends LinearOpMode {
         telemetryThread.start();
 
         diff.driveInches(TILE_WIDTH, DRIVE_SPEED);
-        // --> SENSE CONE
+        String coneSense = "red"; // --> Detect cone here
         diff.driveInches(TILE_WIDTH, DRIVE_SPEED);
+        diff.rotateChassis(45, DRIVE_SPEED);
+        // --> Raise & drop preload cone
+
+        for (int i = 0; i < 2; i++) {
+            diff.rotateChassis(-135, -DRIVE_SPEED);
+            diff.driveInches(TILE_WIDTH, DRIVE_SPEED);
+            // --> Grab cone from stack [go lower every time]
+            diff.driveInches(-TILE_WIDTH, -DRIVE_SPEED);
+            diff.rotateChassis(135, DRIVE_SPEED);
+            /// --> Raise  & drop come
+        }
+
+        diff.rotateChassis(45, DRIVE_SPEED);
+
+        switch (coneSense) {
+            case "red":
+                diff.driveInches(TILE_WIDTH, DRIVE_SPEED);
+                break;
+
+            case "green":
+                //pass
+                break;
+
+            case "blue":
+                diff.driveInches(-TILE_WIDTH, -DRIVE_SPEED);
+                break;
+        }
     }
 
     class TelemetryOut extends Thread {
