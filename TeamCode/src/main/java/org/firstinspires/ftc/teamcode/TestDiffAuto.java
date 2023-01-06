@@ -8,8 +8,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Use this as a template for making new opmodes.
  */
 
-@Autonomous(name="DiffAuto")
-public class DiffAuto extends LinearOpMode {
+@Autonomous(name="TestDiffAuto")
+public class TestDiffAuto extends LinearOpMode {
 
     // Declare OpMode members.
     private final ElapsedTime runtime = new ElapsedTime();
