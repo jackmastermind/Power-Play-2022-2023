@@ -8,13 +8,13 @@ public class DiffMap_Master extends HardwareMap_Master{
     public DiffSwerve diff = new DiffSwerve();
 
     public DcMotor susan, slide;
-    public Servo claw, wrist;
+    public Servo wrist, claw;
 
     @Override
     public void init(HardwareMap ahwMap, boolean chassisOnly) {
         hwMap = ahwMap;
         diff.initialize(ahwMap);
-        motors = diff.motors;
+
         if (!chassisOnly)
         {
             susan = hwMap.get(DcMotor.class, "susan");
@@ -22,6 +22,14 @@ public class DiffMap_Master extends HardwareMap_Master{
 
             claw = hwMap.get(Servo.class, "claw");
             wrist = hwMap.get(Servo.class, "wrist");
+
+            motors = new DcMotor[] {diff.leftTop, diff.leftBottom, diff.rightTop, diff.rightBottom,
+                                    susan, slide};
+            servos = new Servo[] {wrist, claw};
+        }
+        else
+        {
+            motors = diff.motors;
         }
     }
 }
