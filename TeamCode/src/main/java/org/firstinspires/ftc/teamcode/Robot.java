@@ -13,20 +13,15 @@ import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
 /**
- * The Robot class is a child of HardwareMap_Master, and provides several functions that control
+ * The Robot class is a child of MecanumMap_Master, and provides several functions that control
  * the whole robot at once, rather than individual motors or sensors at a time. You declare and
- * initialize it the same way you would a HardwareMap_Master instance.
+ * initialize it the same way you would a MecanumMap_Master instance.
  *
  * @author Jack Thompson, Bubbert Innovations #18351
  */
-public class Robot extends HardwareMap_Master {
+public class Robot extends MecanumMap_Master {
 
     private BNO055IMU imu;          //Internal Motion Unit, built into REV Control Hub
-
-    @Override
-    public void init(HardwareMap ahwMap) {
-        init(ahwMap, false);
-    }
 
     @Override
     public void init(HardwareMap ahwMap, boolean chassisOnly) {
