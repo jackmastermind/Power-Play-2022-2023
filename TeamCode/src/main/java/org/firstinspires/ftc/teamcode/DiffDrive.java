@@ -7,10 +7,11 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @TeleOp(name="Diff Drive")
 public class DiffDrive extends LinearOpMode
 {
-    DiffSwerve diff = new DiffSwerve();
+    DiffMap_Master master = new DiffMap_Master();
+    DiffSwerve diff = master.diff;
 
     public void runOpMode() throws InterruptedException {
-        diff.initialize(hardwareMap);
+        master.init(hardwareMap, true);
 
         ElapsedTime runtime = new ElapsedTime();
 
