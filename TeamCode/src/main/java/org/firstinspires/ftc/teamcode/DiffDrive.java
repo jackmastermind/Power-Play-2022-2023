@@ -88,7 +88,16 @@ public class DiffDrive extends LinearOpMode
                 master.diff.Ki -= 0.1;
             }
 
-            master.diff.SetPod1Powers(gamepad1, deltaTime);
+            // TESTING: 1 pod at a time
+            if (gamepad1.y)
+            {
+                master.diff.SetPod2Powers(gamepad1, deltaTime);
+            }
+            else
+            {
+                master.diff.SetPod1Powers(gamepad1, deltaTime);
+            }
+            //
             //endregion
 
             //region controlling attachments
