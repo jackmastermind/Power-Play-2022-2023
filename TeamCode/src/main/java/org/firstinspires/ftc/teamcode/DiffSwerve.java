@@ -432,10 +432,6 @@ public class DiffSwerve {
         double m1Power = pows[0];
         double m2Power = pows[1];
 
-        //TODO: delete this (for testing right now)
-        m1Power *= 0.6;
-        m2Power *= 0.6;
-
         topMotor.setPower(m1Power);
         bottomMotor.setPower(m2Power);
     }
@@ -450,7 +446,7 @@ public class DiffSwerve {
     /**
      * Set the power of each motor for Pod 2
      */
-    private void SetPod2Powers(Gamepad gamepad1, double dt){
+    public void SetPod2Powers(Gamepad gamepad1, double dt){
         SetPodPowers(gamepad1, rightTop, rightBottom, false, dt);
     }
     //endregion
