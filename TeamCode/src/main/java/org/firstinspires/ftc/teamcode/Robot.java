@@ -21,7 +21,15 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
  */
 public class Robot extends MecanumMap_Master {
 
-    private BNO055IMU imu;          //Internal Motion Unit, built into REV Control Hub
+    public BNO055IMU imu;          //Internal Motion Unit, built into REV Control Hub
+    public static final double TILE_WIDTH = 23.5;
+    public static final double AUTO_DRIVE_SPEED = 0.5;
+    public static final int SLIDE_HIGH_POSITION = 0; //TODO
+    public static final int SLIDE_GRAB_CONE_POSITION = 0; //TODO
+    public static final int SLIDE_LOW_POSITION = 0;
+    public static final double CLAW_OPEN_POSITION = 0.5;
+    public static final double CLAW_CLOSED_POSITION = 0.8;
+
 
     @Override
     public void init(HardwareMap ahwMap, boolean chassisOnly) {
@@ -270,6 +278,22 @@ public class Robot extends MecanumMap_Master {
     public void setTargetPosition(int position) {
         for (DcMotor motor: motors) {
             motor.setTargetPosition(position);
+        }
+    }
+
+    public static void runMotorToPosition(DcMotor motor, int position, double power)
+    {
+        motor.setTargetPosition(position);
+        motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motor.setPower(power);
+
+        while (motor.isBusy())
+        {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

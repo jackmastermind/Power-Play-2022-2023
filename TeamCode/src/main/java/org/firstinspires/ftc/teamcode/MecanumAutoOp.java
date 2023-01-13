@@ -16,13 +16,14 @@ public class MecanumAutoOp extends LinearOpMode {
     // Declare OpMode members.
     private final ElapsedTime runtime = new ElapsedTime();
     private final Robot robot = new Robot();
-    private final double TILE_WIDTH = 0;
-    private final double DRIVE_SPEED = 0.5;
     
     @Override
     public void runOpMode() {
-        //INITIALIZATION CODE
+        //region INITIALIZATION CODE
         robot.init(hardwareMap);
+        robot.clawServo.setPosition(Robot.CLAW_CLOSED_POSITION);
+        robot.clawWrist.setPosition(0);
+        //endregion
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
@@ -31,26 +32,42 @@ public class MecanumAutoOp extends LinearOpMode {
         TelemetryOut telemetryThread = new TelemetryOut();
         telemetryThread.start();
 
-        robot.moveEncoder(TILE_WIDTH, DRIVE_SPEED);
+        // 1. Go forward & detect signal cone.
+        robot.moveEncoder(Robot.TILE_WIDTH, Robot.AUTO_DRIVE_SPEED);
         String coneSense = "red"; // --> Detect cone here
-        robot.moveEncoder(TILE_WIDTH, DRIVE_SPEED);
-        robot.turnEncoder(45, DRIVE_SPEED);
-        // --> Raise & drop preload cone
 
+        // 2. Forward & turn to face high pole.
+        robot.moveEncoder(Robot.TILE_WIDTH, Robot.AUTO_DRIVE_SPEED);
+        robot.turnEncoder(45, Robot.AUTO_DRIVE_SPEED);
+
+        // 3. Raise & drop preload cone on high pole.
+        Robot.runMotorToPosition(robot.spool, Robot.SLIDE_HIGH_POSITION, Robot.AUTO_DRIVE_SPEED);
+        robot.clawServo.setPosition(Robot.CLAW_OPEN_POSITION);
+
+        // 4. Grab & drop 2 cones on high pole.
         for (int i = 0; i < 2; i++) {
-            robot.turnEncoder(-135, -DRIVE_SPEED);
-            robot.moveEncoder(TILE_WIDTH, DRIVE_SPEED);
-            // --> Grab cone from stack [go lower every time]
-            robot.moveEncoder(-TILE_WIDTH, -DRIVE_SPEED);
-            robot.turnEncoder(135, DRIVE_SPEED);
-            /// --> Raise  & drop come
+            // A. Move to stack
+            robot.turnEncoder(-135, -Robot.AUTO_DRIVE_SPEED);
+            robot.moveEncoder(Robot.TILE_WIDTH, Robot.AUTO_DRIVE_SPEED);
+
+            // B. Grab cone from stack
+            Robot.runMotorToPosition(robot.spool, Robot.SLIDE_GRAB_CONE_POSITION, Robot.AUTO_DRIVE_SPEED);
+            robot.clawServo.setPosition(Robot.CLAW_CLOSED_POSITION);
+
+            // C. Return to high pole.
+            robot.moveEncoder(-Robot.TILE_WIDTH, -Robot.AUTO_DRIVE_SPEED);
+            robot.turnEncoder(135, Robot.AUTO_DRIVE_SPEED);
+
+            // D. Raise & drop cone on high pole.
+            Robot.runMotorToPosition(robot.spool, Robot.SLIDE_HIGH_POSITION, Robot.AUTO_DRIVE_SPEED);
+            robot.clawServo.setPosition(Robot.CLAW_CLOSED_POSITION);
         }
 
-        robot.turnEncoder(45, DRIVE_SPEED);
-
+        // 5. Straighten out and park in the appropriate location.
+        robot.turnEncoder(45, Robot.AUTO_DRIVE_SPEED);
         switch (coneSense) {
             case "red":
-                robot.moveEncoder(TILE_WIDTH, DRIVE_SPEED);
+                robot.moveEncoder(Robot.TILE_WIDTH, Robot.AUTO_DRIVE_SPEED);
                 break;
 
             case "green":
@@ -58,7 +75,7 @@ public class MecanumAutoOp extends LinearOpMode {
                 break;
 
             case "blue":
-                robot.moveEncoder(-TILE_WIDTH, -DRIVE_SPEED);
+                robot.moveEncoder(-Robot.TILE_WIDTH, -Robot.AUTO_DRIVE_SPEED);
                 break;
         }
     }
