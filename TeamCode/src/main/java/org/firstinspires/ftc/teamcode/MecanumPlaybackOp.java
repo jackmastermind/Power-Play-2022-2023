@@ -33,13 +33,11 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-
 @Autonomous(name="Playback Op")
-public class PlaybackOp extends LinearOpMode {
+public class MecanumPlaybackOp extends LinearOpMode {
 
     private final ElapsedTime runtime = new ElapsedTime();
-    private final HardwareMap_Master master = new HardwareMap_Master();
+    private final MecanumMap_Master master = new MecanumMap_Master();
 
     @Override
     public void runOpMode() {

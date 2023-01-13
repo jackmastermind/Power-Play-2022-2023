@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.google.gson.reflect.TypeToken;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -38,7 +39,7 @@ public class MotorPlayback {
     private boolean finished;                     //Has the MotorPlayback run through all its data?
 
     /**
-     * Construct a new MotorPlayback object.
+     * Construct a new MotorPlayback object with a HardwareMap_Master.
      *
      * @param filePath The name of the recording file you are trying to access (no need for a full
      *                 file directory).
@@ -47,6 +48,23 @@ public class MotorPlayback {
      */
     public MotorPlayback(String filePath, ElapsedTime runtime, HardwareMap_Master master) {
         this(filePath, runtime, master, null);
+    }
+
+    /**
+     * Construct a new MotorPlayback manually.
+     *
+     * @param filePath The name of the recording file you are trying to access (no need for a full
+     *                 file directory).
+     * @param runtime  The ElapsedTime instance of the current opmode.
+     * @param hardwareMap HardwareMap to retrieve appContext for file reading.
+     * @param motors Array of motors to playback. These must be in the same order that the
+     *               MotorRecorder was constructed with.
+     * @param servos Array of servos to playback. These must be in the same order that the
+     *               MotorRecorder was constructed with.
+     */
+    public MotorPlayback(String filePath, ElapsedTime runtime, HardwareMap hardwareMap,
+                         DcMotor[] motors, Servo[] servos) {
+        this(filePath, runtime, hardwareMap, motors, servos, null);
     }
 
     /**
@@ -60,11 +78,29 @@ public class MotorPlayback {
      */
     public MotorPlayback(String filePath, ElapsedTime runtime, HardwareMap_Master master,
                          Telemetry errorLog) {
-        this.data = FileEditor.readJSON(master.hwMap, dataType, filePath, errorLog);
+        this(filePath, runtime, master.hwMap, master.motors, master.servos, errorLog);
+    }
+
+    /**
+     * Construct a new MotorPlayback manually.
+     *
+     * @param filePath The name of the recording file you are trying to access (no need for a full
+     *                 file directory).
+     * @param runtime  The ElapsedTime instance of the current opmode.
+     * @param hardwareMap HardwareMap to retrieve appContext for file reading.
+     * @param motors Array of motors to playback. These must be in the same order that the
+     *               MotorRecorder was constructed with.
+     * @param servos Array of servos to playback. These must be in the same order that the
+     *               MotorRecorder was constructed with.
+     * @param errorLog The Telemetry instance of the current opmode.
+     */
+    public MotorPlayback(String filePath, ElapsedTime runtime, HardwareMap hardwareMap,
+                         DcMotor[] motors, Servo[] servos, Telemetry errorLog)
+    {
+        this.data = FileEditor.readJSON(hardwareMap, dataType, filePath, errorLog);
         this.runtime = runtime;
-        this.motors = master.motors;
-        this.servos = master.servos;
-        this.dataIndex = 0;
+        this.motors = motors;
+        this.servos = servos;
         assert data != null;
         this.nextSnapshot = data.get(dataIndex);
     }

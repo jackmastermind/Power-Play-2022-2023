@@ -31,12 +31,11 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name="Run Motor")
 public class RunMotor extends LinearOpMode {
 
-    private final HardwareMap_Master master = new HardwareMap_Master();
+    private final MecanumMap_Master master = new MecanumMap_Master();
 
     @Override
     public void runOpMode() {

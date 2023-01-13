@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @TeleOp(name="Mecanum Drive")
 public class MecanumDrive extends LinearOpMode
 {
-    HardwareMap_Master masterHardware = new HardwareMap_Master();
+    MecanumMap_Master masterHardware = new MecanumMap_Master();
 
     public void runOpMode()
     {

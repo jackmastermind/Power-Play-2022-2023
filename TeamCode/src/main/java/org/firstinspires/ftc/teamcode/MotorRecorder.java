@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.google.gson.reflect.TypeToken;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -39,20 +40,52 @@ public class MotorRecorder {
     private Telemetry errorLog;             //Optional telemetry to output file writing errors to.
 
     /**
-     * Construct a MotorRecorder.
+     * Construct a MotorRecorder with a HardwareMap_Master.
      *
      * @param runtime  The ElapsedTime instance of the current opmode.
      * @param master   A HardwareMap_Master instance to retrieve motor information from.
      * @param interval How frequently to take snapshots
      */
     public MotorRecorder(ElapsedTime runtime, HardwareMap_Master master, double interval) {
+        this(runtime, master.hwMap, master.motors, master.servos, interval);
+    }
+
+    /**
+     * Construct a MotorRecorder manually, with a list of motors & servos.
+     *
+     * @param runtime The ElapsedTime instance of the current opmode.
+     * @param hardwareMap HardwareMap to get appContext information for file storage.
+     * @param motors Motors to record.
+     * @param servos Servos to record.
+     * @param interval How frequently to take snapshots.
+     */
+    public MotorRecorder(ElapsedTime runtime, HardwareMap hardwareMap, DcMotor[] motors,
+                         Servo[] servos, double interval) {
         this.data = new ArrayList<>();
         this.runtime = runtime;
-        this.context = master.hwMap.appContext;
-        this.motors = master.motors;
-        this.servos = master.servos;
+        this.context = hardwareMap.appContext;
+        this.motors = motors;
+        this.servos = servos;
         this.interval = interval;
         this.lastSnapshotTime = 0;
+    }
+
+    /**
+     *
+     * Construct a MotorRecorder manually with a telemetry object to log errors to.
+     *
+     * @param runtime The ElapsedTime instance of the current opmode.
+     * @param hardwareMap HardwareMap to get appContext information for file storage.
+     * @param motors Motors to record.
+     * @param servos Servos to record.
+     * @param interval How frequently to take snapshots.
+     * @param errorLog A Telemetry instance that errors in file-writing will be logged to.
+     */
+    public MotorRecorder(ElapsedTime runtime, HardwareMap hardwareMap, DcMotor[] motors,
+                         Servo[] servos, double interval, Telemetry errorLog)
+    {
+        this(runtime, hardwareMap, motors, servos, interval);
+        this.errorLog = errorLog;
     }
 
     /**     * Construct a MotorRecorder with a telemetry object to log errors to.
