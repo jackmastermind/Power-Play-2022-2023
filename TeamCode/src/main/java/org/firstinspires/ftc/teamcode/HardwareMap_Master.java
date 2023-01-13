@@ -54,15 +54,18 @@ public class HardwareMap_Master
     public DcMotor backLeft;
     public DcMotor backRight;
 
-    public DcMotor collector;   // Gecko wheel rolling in freight
-    public DcMotor spool;       // Spool controlling the height of the x-rail
-    public DcMotor arm;         // Control the pivoting arm of the box
-    public DcMotor carousel;    // The motor that spins the duck carousel
+    public DcMotor susan;       // Lazy susan wheel
+    public DcMotor spool;      // Linear slide motor 1
+    public DcMotor arm;      // Linear slide motor 2
+
+    public Servo clawWrist;
+    public Servo clawServo;     // Servo to open & close claw
 
     public DcMotor[] motors;
     public Servo[] servos;
 
-    public static final double WHEEL_CIRCUMFERENCE_INCHES = 9.276;
+    //OLD DATA
+    public static final double WHEEL_CIRCUMFERENCE_INCHES = 4 * Math.PI;
     public static final double TICKS_PER_ROTATION = 560;
     public static final double ROBOT_DIAMETER_INCHES = 24.456;
 
@@ -85,10 +88,13 @@ public class HardwareMap_Master
         backRight = hwMap.get(DcMotor.class, "driveBR");
 
         if (!chassisOnly) {
-            collector = hwMap.get(DcMotor.class, "collector");
+            susan = hwMap.get(DcMotor.class, "susan");
             spool = hwMap.get(DcMotor.class, "spool");
             arm = hwMap.get(DcMotor.class, "arm");
-            carousel = hwMap.get(DcMotor.class, "carousel");
+
+            clawWrist = hwMap.get(Servo.class, "clawWrist");
+            clawServo = hwMap.get(Servo.class, "clawServo");
+
         }
 
         if (chassisOnly)
@@ -96,24 +102,20 @@ public class HardwareMap_Master
             motors = new DcMotor[] {frontLeft, frontRight, backLeft, backRight};
         }
         else {
-            motors = new DcMotor[]{frontLeft, frontRight, backLeft, backRight, collector, spool, arm, carousel};
-            servos = new Servo[]{};
+            motors = new DcMotor[] {frontLeft, frontRight, backLeft, backRight,
+                    susan, spool, arm};
+            servos = new Servo[] {clawWrist, clawServo};
         }
 
-        frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        frontRight.setDirection(DcMotor.Direction.FORWARD);
-        backLeft.setDirection(DcMotor.Direction.REVERSE);
-        backRight.setDirection(DcMotor.Direction.FORWARD);
-
-        if (!chassisOnly) {
-            carousel.setDirection(DcMotorSimple.Direction.REVERSE);
-            collector.setDirection(DcMotorSimple.Direction.REVERSE);
-            arm.setDirection(DcMotorSimple.Direction.REVERSE);
-        }
+        frontLeft.setDirection(DcMotor.Direction.FORWARD);
+        frontRight.setDirection(DcMotor.Direction.REVERSE);
+        backLeft.setDirection(DcMotor.Direction.FORWARD);
+        backRight.setDirection(DcMotor.Direction.REVERSE);
 
         // Hardware Initialization
         for (DcMotor m: motors) {
             m.setPower(0);
+            m.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             m.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             m.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         }

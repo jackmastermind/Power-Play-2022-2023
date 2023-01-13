@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name="Mecanum Drive")
@@ -10,38 +9,40 @@ public class MecanumDrive extends LinearOpMode
 {
     HardwareMap_Master masterHardware = new HardwareMap_Master();
 
-
     public void runOpMode()
     {
         ElapsedTime runtime = new ElapsedTime();
+        boolean clawOpen = true;
+        boolean aDown = false;
         masterHardware.init(hardwareMap);
+        double wristTarget = 0.9;
         MotorRecorder recorder = new MotorRecorder(runtime, masterHardware, 0.01, telemetry);
 
-        //RESET MOTOR ENCODER THING BRUH
-        masterHardware.spool.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        masterHardware.clawWrist.setPosition(wristTarget);
+        masterHardware.clawServo.setPosition(0);
 
         waitForStart();
         runtime.reset();
 
         while (opModeIsActive()) {
-            masterHardware.spool.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-            double powerMultiplier = 1;
+            //region  ------------------------------- Gamepad 1 -------------------------------
+            double powerMultiplier = 0.5;
             if (gamepad1.left_bumper) {
-                powerMultiplier = 0.5;
+                powerMultiplier = 0.25;
             }
 
             double inputLX = gamepad1.left_stick_x;
             double inputLY = gamepad1.left_stick_y;
             double inputRX = gamepad1.right_stick_x;
 
-            double d = Math.max(Math.abs(inputLX)+Math.abs(inputLY), 1.0);
+            double normalization = Math.max(Math.abs(inputLX) + Math.abs(inputLY) + Math.abs(inputRX), 1.0);
 
-            double flPower = Math.pow(((-inputLX + inputLY) - inputRX)/d, 3) * powerMultiplier;
-            double blPower = Math.pow(((inputLX + inputLY) - inputRX)/d, 3) * powerMultiplier;
+            double flPower = Math.pow(((-inputLX + inputLY) - inputRX)/ normalization, 3) * powerMultiplier;
+            double blPower = Math.pow(((inputLX + inputLY) - inputRX)/ normalization, 3) * powerMultiplier;
 
-            double frPower = Math.pow(((inputLX + inputLY) + inputRX)/d, 3) * powerMultiplier;
-            double brPower = Math.pow(((-inputLX + inputLY) + inputRX)/d, 3) * powerMultiplier;
+            double frPower = Math.pow(((inputLX + inputLY) + inputRX)/ normalization, 3) * powerMultiplier;
+            double brPower = Math.pow(((-inputLX + inputLY) + inputRX)/ normalization, 3) * powerMultiplier;
 
             if (gamepad1.right_trigger >= 0.75)
             {
@@ -54,69 +55,88 @@ public class MecanumDrive extends LinearOpMode
                     telemetry.addData("DUMPING MODE", "complete!");
                 }
             }
+            //endregion
 
-            //---------------------- Gamepad 2 -------------------------------------
-            double collectorSpeed = 0.1;
-            double spoolSpeed = 0.6;
-            double armSpeed = 0.2;
-            double carouselSpeed = 0.25;
+            //region  ------------------------------- Gamepad 2 -------------------------------
+            double susanSpeed = 1;
+            double spoolSpeed = 0.4;
+            double armSpeed   = 0.4;
+            double wristSpeed = -0.003;
 
-            double inputRT2 = gamepad2.right_trigger;
-            double inputLT2 = gamepad2.left_trigger;
-            int inputDPad2 = (gamepad2.dpad_up ? 1 : 0) - (gamepad2.dpad_down ? 1 : 0);
-            int inputBumpers2 = (gamepad2.right_bumper ? 1 : 0) - (gamepad2.left_bumper ? 1 : 0);
-            double inputLY2 = gamepad2.left_stick_y;
+            double susanInput = gamepad2.right_trigger - gamepad2.left_trigger;
+            double spoolInput = gamepad2.right_stick_y;
+            double armInput   = gamepad2.left_stick_y;
+            double wristInput = (gamepad2.dpad_up ? 1 : 0) - (gamepad2.dpad_down ? 1 : 0);
 
-            double colPower = Math.pow(inputRT2 - inputLT2, 3) * collectorSpeed;
-            double spoolPower = inputDPad2 * spoolSpeed;
+            double susanPower = Math.pow(susanInput * susanSpeed, 3);
+            double spoolPower = Math.pow(spoolInput * spoolSpeed, 3);
+            double armPower   = Math.pow(armInput * armSpeed, 3);
 
-            double armPower = inputLY2 * armSpeed;
-            double carouselPower = inputBumpers2 * carouselSpeed;
+            wristTarget += wristSpeed * wristInput;
 
+            if (wristTarget > 1)
+            {
+                wristTarget = 1;
+            }
+            else if (wristTarget < 0)
+            {
+                wristTarget = 0;
+            }
+
+            //endregion
+
+            //region ----------------------------- Setting Power -----------------------------
             masterHardware.frontLeft.setPower(flPower);
             masterHardware.frontRight.setPower(frPower);
             masterHardware.backLeft.setPower(blPower);
             masterHardware.backRight.setPower(brPower);
-            masterHardware.collector.setPower(colPower);
 
-            //This part is to restrict the spool motor from turning too much and breaking the string
-            if(gamepad2.y){
-                masterHardware.spool.setPower(spoolPower);
-            }
-            else {
-                if (masterHardware.spool.getCurrentPosition() >= 2700)
-                    if (spoolPower > 0)
-                        masterHardware.spool.setPower(0);
-                    else
-                        masterHardware.spool.setPower(spoolPower);
-                if (masterHardware.spool.getCurrentPosition() <= 0)
-                    if (spoolPower < 0)
-                        masterHardware.spool.setPower(0);
-                    else
-                        masterHardware.spool.setPower(spoolPower);
-                else
-                    masterHardware.spool.setPower(spoolPower);
-            }
-
+            masterHardware.susan.setPower(susanPower);
+            masterHardware.spool.setPower(spoolPower);
             masterHardware.arm.setPower(armPower);
-            masterHardware.carousel.setPower(carouselPower);
+
+            masterHardware.clawWrist.setPosition(wristTarget);
+
+            if (gamepad2.a && !aDown)
+            {
+                aDown = true;
+                if (clawOpen)
+                {
+                    masterHardware.clawServo.setPosition(0.25);
+                    clawOpen = false;
+                }
+                else
+                {
+                    masterHardware.clawServo.setPosition(0);
+                    clawOpen = true;
+                }
+            }
+            else if (!gamepad2.a){
+                aDown = false;
+            }
+
+            //endregion
 
             recorder.updateData();
 
-            telemetry.addData("Spool Position ", masterHardware.spool.getCurrentPosition());
-            telemetry.addData("X Axis", inputLX);
-            telemetry.addData("Y Axis", inputLY);
+            //region ----------------------------- Telemetry ---------------------------------
             telemetry.addData("fl", flPower);
             telemetry.addData("fr", frPower);
             telemetry.addData("bl", blPower);
             telemetry.addData("br", brPower);
-
-            telemetry.addData("collector", colPower);
+            telemetry.addLine();
+            telemetry.addData("susan", susanPower);
             telemetry.addData("spool", spoolPower);
             telemetry.addData("arm", armPower);
-            telemetry.addData("carousel", carouselPower);
-
+            telemetry.addLine();
+            telemetry.addData("claw position", masterHardware.clawServo.getPosition());
+            telemetry.addData("wristTarget", wristTarget);
+            telemetry.addData("wrist position", masterHardware.clawWrist.getPosition());
+            telemetry.addLine();
+            telemetry.addData("[DEBUG] aDown?", aDown);
+            telemetry.addData("[DEBUG] clawOpen?", clawOpen);
             telemetry.update();
+            //endregion
         }
     }
 }
