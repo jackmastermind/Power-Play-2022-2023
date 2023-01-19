@@ -29,9 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -52,18 +50,22 @@ public class MecanumMap_Master extends HardwareMap_Master
     public DcMotor frontRight;
     public DcMotor backLeft;
     public DcMotor backRight;
+    public DcMotor[] driveMotors;
 
-    public DcMotor susan;       // Lazy susan wheel
-    public DcMotor spool;      // Linear slide motor 1
-    public DcMotor arm;      // Linear slide motor 2
-
+    public DcMotor susan;           // Lazy susan wheel
+    public DcMotor shoulderJoint;   // Lower arm hex motor
+    public DcMotor elbowJoint;      // Higher arm joint
     public Servo clawWrist;
     public Servo clawServo;     // Servo to open & close claw
 
-    //OLD DATA
     public static final double WHEEL_CIRCUMFERENCE_INCHES = 4 * Math.PI;
-    public static final double TICKS_PER_ROTATION = 560;
-    public static final double ROBOT_DIAMETER_INCHES = 24.456;
+    public static final double TICKS_PER_ROTATION = 537.7;
+    public static final double ROBOT_DIAMETER_INCHES = 24.456; //TODO: Update
+
+    public static final double TILE_WIDTH = 23.5;
+    public static final double AUTO_DRIVE_SPEED = 0.5;
+    public static final double CLAW_CLOSED_POSITION = 0.6;
+    public static final double CLAW_OPEN_POSITION = 0.8;
 
     /* Initialize standard Hardware interfaces */
     @Override
@@ -77,10 +79,12 @@ public class MecanumMap_Master extends HardwareMap_Master
         backLeft = hwMap.get(DcMotor.class, "driveBL");
         backRight = hwMap.get(DcMotor.class, "driveBR");
 
+        driveMotors = new DcMotor[] {frontLeft, frontRight, backLeft, backRight};
+
         if (!chassisOnly) {
             susan = hwMap.get(DcMotor.class, "susan");
-            spool = hwMap.get(DcMotor.class, "spool");
-            arm = hwMap.get(DcMotor.class, "arm");
+            shoulderJoint = hwMap.get(DcMotor.class, "shoulderJoint");
+            elbowJoint = hwMap.get(DcMotor.class, "elbowJoint");
 
             clawWrist = hwMap.get(Servo.class, "clawWrist");
             clawServo = hwMap.get(Servo.class, "clawServo");
@@ -93,7 +97,7 @@ public class MecanumMap_Master extends HardwareMap_Master
         }
         else {
             motors = new DcMotor[] {frontLeft, frontRight, backLeft, backRight,
-                    susan, spool, arm};
+                    susan, shoulderJoint, elbowJoint};
             servos = new Servo[] {clawWrist, clawServo};
         }
 
@@ -109,6 +113,128 @@ public class MecanumMap_Master extends HardwareMap_Master
             m.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             m.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         }
+    }
+
+    public void moveEncoder(double inches, double power) {
+        //Gets the proper target position with some math & robot specs inherited from hwmap master.
+        int target = (int) Math.round((inches / WHEEL_CIRCUMFERENCE_INCHES) * TICKS_PER_ROTATION);
+
+        //Resets encoder ticks, sets the position, and gets the robot moving to the position.
+        setDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        setDriveTargetPosition(target);
+        setDrivePower(power);
+        setDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        //Wait for the robot to stop moving
+        while (frontLeft.isBusy()) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                break;
+            }
+        }
+
+        //Stop the robot, reset encoder ticks, change run mode back to normal.
+        setDrivePower(0);
+        setDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        setDriveMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+
+    public void moveTiles(double tiles, double power)
+    {
+        moveEncoder(tiles * TILE_WIDTH, power);
+    }
+
+    public void moveTiles(double tiles)
+    {
+        if (tiles < 0)
+        {
+            moveTiles(tiles, -AUTO_DRIVE_SPEED);
+
+        }
+        else
+        {
+            moveTiles(tiles, AUTO_DRIVE_SPEED);
+        }
+    }
+
+    public void turnEncoder(double degrees, double power) {
+        int target = (int) Math.round((Math.PI * ROBOT_DIAMETER_INCHES / 360)   //Inches per degree
+                * degrees                                 //times degrees
+                * (1 / WHEEL_CIRCUMFERENCE_INCHES)        //times rotations per inch
+                * TICKS_PER_ROTATION);                    //times ticks per rotation
+        //equals ticks.
+        setDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        frontLeft.setTargetPosition(target);
+        backLeft.setTargetPosition(target);
+        frontRight.setTargetPosition(-target);
+        backRight.setTargetPosition(-target);
+
+        frontLeft.setPower(power);
+        backLeft.setPower(power);
+        frontRight.setPower(-power);
+        backRight.setPower(-power);
+
+        setDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        //Wait for the robot to stop moving
+        while (frontLeft.isBusy()) {
+            try {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e) {
+                break;
+            }
+        }
+
+        //Stop the robot, reset encoder ticks, change run mode back to normal.
+        setDrivePower(0);
+        setDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        setDriveMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+
+    public void setDrivePower(double power) {
+        for (DcMotor motor: driveMotors) {
+            motor.setPower(power);
+        }
+    }
+
+    public void setDriveMode(DcMotor.RunMode mode) {
+        for (DcMotor motor: motors) {
+            motor.setMode(mode);
+        }
+    }
+
+    public void setDriveTargetPosition(int position) {
+        for (DcMotor motor: motors) {
+            motor.setTargetPosition(position);
+        }
+    }
+
+    public static void runMotorToPosition(DcMotor motor, int position, double power)
+    {
+        motor.setTargetPosition(position);
+        motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motor.setPower(power);
+
+        while (motor.isBusy())
+        {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void openClaw()
+    {
+        clawServo.setPosition(CLAW_OPEN_POSITION);
+    }
+
+    public void closeClaw()
+    {
+        clawServo.setPosition(CLAW_CLOSED_POSITION);
     }
  }
 

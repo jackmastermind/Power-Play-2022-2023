@@ -59,18 +59,12 @@ public class MecanumDrive extends LinearOpMode
 
             //region  ------------------------------- Gamepad 2 -------------------------------
             double susanSpeed = 1;
-            double spoolSpeed = 0.4;
-            double armSpeed   = 0.4;
             double wristSpeed = -0.003;
 
-            double susanInput = gamepad2.right_trigger - gamepad2.left_trigger;
-            double spoolInput = gamepad2.right_stick_y;
-            double armInput   = gamepad2.left_stick_y;
+            double susanInput = gamepad2.right_trigger - gamepad2.left_trigger;;
             double wristInput = (gamepad2.dpad_up ? 1 : 0) - (gamepad2.dpad_down ? 1 : 0);
 
             double susanPower = Math.pow(susanInput * susanSpeed, 3);
-            double spoolPower = Math.pow(spoolInput * spoolSpeed, 3);
-            double armPower   = Math.pow(armInput * armSpeed, 3);
 
             wristTarget += wristSpeed * wristInput;
 
@@ -92,8 +86,6 @@ public class MecanumDrive extends LinearOpMode
             masterHardware.backRight.setPower(brPower);
 
             masterHardware.susan.setPower(susanPower);
-            masterHardware.spool.setPower(spoolPower);
-            masterHardware.arm.setPower(armPower);
 
             masterHardware.clawWrist.setPosition(wristTarget);
 
@@ -126,8 +118,6 @@ public class MecanumDrive extends LinearOpMode
             telemetry.addData("br", brPower);
             telemetry.addLine();
             telemetry.addData("susan", susanPower);
-            telemetry.addData("spool", spoolPower);
-            telemetry.addData("arm", armPower);
             telemetry.addLine();
             telemetry.addData("claw position", masterHardware.clawServo.getPosition());
             telemetry.addData("wristTarget", wristTarget);
