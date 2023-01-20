@@ -67,6 +67,9 @@ public class MecanumMap_Master extends HardwareMap_Master
     public static final double CLAW_CLOSED_POSITION = 0.6;
     public static final double CLAW_OPEN_POSITION = 0.8;
 
+    // SHOULDER needs to turn 120
+    // ELBOW needs to turn 60
+
     /* Initialize standard Hardware interfaces */
     @Override
     public void init(HardwareMap ahwMap, boolean chassisOnly) {
@@ -83,8 +86,8 @@ public class MecanumMap_Master extends HardwareMap_Master
 
         if (!chassisOnly) {
             susan = hwMap.get(DcMotor.class, "susan");
-            shoulderJoint = hwMap.get(DcMotor.class, "shoulderJoint");
-            elbowJoint = hwMap.get(DcMotor.class, "elbowJoint");
+            shoulderJoint = hwMap.get(DcMotor.class, "shoulder");
+            elbowJoint = hwMap.get(DcMotor.class, "elbow");
 
             clawWrist = hwMap.get(Servo.class, "clawWrist");
             clawServo = hwMap.get(Servo.class, "clawServo");
