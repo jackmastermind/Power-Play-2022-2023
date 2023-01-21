@@ -45,9 +45,9 @@ public class RunMotor extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()) {
 
-            //master.motor.setPower(gamepad1.left_stick_y);
+            master.frontLeft.setPower(gamepad1.left_stick_y);
 
-            telemetry.addData("Motor Power", gamepad1.left_stick_y);
+            telemetry.addData("Motor Power", master.frontLeft.getPower());
             telemetry.update();
         }
     }

@@ -59,8 +59,8 @@ public class MecanumMap_Master extends HardwareMap_Master
     public Servo clawWrist;
     public Servo clawServo;     // Servo to open & close claw
 
-    public double shoulderKp = 0.001, shoulderKi = 0, shoulderKd = 0;
-    public double elbowKp = 0.002, elbowKi = 0, elbowKd = 0;
+    public double shoulderKp = 0.000015, shoulderKi = 0, shoulderKd = 0;
+    public double elbowKp = 0.00003, elbowKi = 0, elbowKd = 0;
 
     public double shoulderIntegral = 0, shoulderLastError = 0;
     public double elbowIntegral = 0, elbowLastError = 0;
@@ -117,13 +117,12 @@ public class MecanumMap_Master extends HardwareMap_Master
         backRight.setDirection(DcMotor.Direction.REVERSE);
 
         shoulderJoint.setDirection(DcMotorSimple.Direction.REVERSE);
-        elbowJoint.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Hardware Initialization
         for (DcMotor m: motors) {
             m.setPower(0);
             m.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            m.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            m.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             m.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         }
     }
@@ -262,9 +261,10 @@ public class MecanumMap_Master extends HardwareMap_Master
         //Shoulder PID
         double shoulderP = shoulderKp * shoulderError;
         shoulderIntegral += shoulderKi * shoulderError * dt;
-        double shoulderD = shoulderKd * (shoulderError - shoulderLastError);
+        double shoulderD = shoulderKd * (shoulderError - shoulderLastError) / dt;
 
         shoulderJoint.setPower(shoulderP + shoulderIntegral + shoulderD);
+        shoulderLastError = shoulderError;
 
         //Elbow PID
         double elbowP = elbowKp * elbowError;
@@ -272,6 +272,7 @@ public class MecanumMap_Master extends HardwareMap_Master
         double elbowD = elbowKd * (elbowError - elbowLastError) / dt;
 
         elbowJoint.setPower(elbowP + elbowIntegral + elbowD);
+        elbowLastError = elbowError;
     }
 
     private double calcShoulderTarget(double armTarget)

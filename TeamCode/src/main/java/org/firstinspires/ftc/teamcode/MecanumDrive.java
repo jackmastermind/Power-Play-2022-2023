@@ -21,7 +21,7 @@ public class MecanumDrive extends LinearOpMode
         double armTarget = 0.0; //Only used for PID mode
 
         telemetry.setAutoClear(false);
-        /*telemetry.addLine("ARM MODE: Press gamepad1.a to use PID arm mode OR gamepad1.b to use manual controls");
+        telemetry.addLine("ARM MODE: Press gamepad1.a to use PID arm mode OR gamepad1.b to use manual controls");
         telemetry.update();
 
         while (opModeInInit())
@@ -37,7 +37,7 @@ public class MecanumDrive extends LinearOpMode
                 armModeChosen = true;
                 break;
             }
-        }*/
+        }
 
         if (!armModeChosen)
         {
@@ -115,8 +115,8 @@ public class MecanumDrive extends LinearOpMode
             }
             else
             {
-                double shoulderSpeed = 0.2;
-                double elbowSpeed = 0.8;
+                double shoulderSpeed = 0.4;
+                double elbowSpeed = 0.5;
 
                 double shoulderInput = gamepad2.left_stick_y;
                 double elbowInput = gamepad2.right_stick_y;
