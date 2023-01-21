@@ -58,6 +58,12 @@ public class MecanumMap_Master extends HardwareMap_Master
     public Servo clawWrist;
     public Servo clawServo;     // Servo to open & close claw
 
+    public double shoulderKp = 1, shoulderKi = 0, shoulderKd = 0;
+    public double elbowKp = 1, elbowKi = 0, elbowKd = 0;
+
+    public double shoulderIntegral = 0, shoulderLastError = 0;
+    public double elbowIntegral = 0, elbowLastError = 0;
+
     public static final double WHEEL_CIRCUMFERENCE_INCHES = 4 * Math.PI;
     public static final double TICKS_PER_ROTATION = 537.7;
     public static final double ROBOT_DIAMETER_INCHES = 24.456; //TODO: Update
@@ -238,6 +244,42 @@ public class MecanumMap_Master extends HardwareMap_Master
     public void closeClaw()
     {
         clawServo.setPosition(CLAW_CLOSED_POSITION);
+    }
+
+
+    public void moveArmTowardTarget(double armTarget, double dt) //position in range [0, 1]
+    {
+        //https://www.desmos.com/calculator/l9crojrbiw
+        assert armTarget >= 0 && armTarget <= 1;
+
+        double shoulderError = calcShoulderTarget(armTarget) - shoulderJoint.getCurrentPosition();
+        double elbowError = calcElbowTarget(armTarget) - elbowJoint.getCurrentPosition();
+
+        //Shoulder PID
+        double shoulderP = shoulderKp * shoulderError;
+        shoulderIntegral += shoulderKi * shoulderError * dt;
+        double shoulderD = shoulderKd * (shoulderError - shoulderLastError);
+
+        shoulderJoint.setPower(shoulderP + shoulderIntegral + shoulderD);
+
+        //Elbow PID
+        double elbowP = elbowKp * elbowError;
+        elbowIntegral += elbowKi * elbowError * dt;
+        double elbowD = elbowKd * (elbowError - elbowLastError) / dt;
+
+        elbowJoint.setPower(elbowP + elbowIntegral + elbowD);
+    }
+
+    private double calcShoulderTarget(double armTarget)
+    {
+        //https://www.desmos.com/calculator/l9crojrbiw
+        return -378 * Math.pow(armTarget, 2) + 525.6 * armTarget + 126.2;
+    }
+
+    private double calcElbowTarget(double armTarget)
+    {
+        //https://www.desmos.com/calculator/l9crojrbiw
+        return 24.8212 * Math.sin(5.86558 * (armTarget - 0.0803716)) - 97.7273;
     }
  }
 

@@ -7,22 +7,57 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @TeleOp(name="Mecanum Drive")
 public class MecanumDrive extends LinearOpMode
 {
-    MecanumMap_Master masterHardware = new MecanumMap_Master();
+    MecanumMap_Master master = new MecanumMap_Master();
 
     public void runOpMode()
     {
         ElapsedTime runtime = new ElapsedTime();
+
         boolean clawOpen = true;
         boolean aDown = false;
-        masterHardware.init(hardwareMap);
+        boolean armModeChosen = false;
+        boolean useArmPID = false;
         double wristTarget = 0.9;
-        MotorRecorder recorder = new MotorRecorder(runtime, masterHardware, 0.01, telemetry);
+        double armTarget = 0.0; //Only used for PID mode
 
-        masterHardware.clawWrist.setPosition(wristTarget);
-        masterHardware.clawServo.setPosition(0);
+        telemetry.setAutoClear(false);
+        telemetry.addLine("ARM MODE: Press gamepad1.a to use PID arm mode OR gamepad1.b to use manual controls");
+        telemetry.update();
+
+        while (opModeInInit())
+        {
+            if (gamepad1.a)
+            {
+                armModeChosen = true;
+                useArmPID = true;
+                break;
+            }
+            if (gamepad1.b)
+            {
+                armModeChosen = true;
+                break;
+            }
+        }
+
+        if (!armModeChosen)
+        {
+            telemetry.addLine("warning: useArmPID mode not chosen; defaulting to false");
+            telemetry.update();
+        }
+
+        telemetry.addData("useArmPID", useArmPID);
+        telemetry.update();
+
+        master.init(hardwareMap);
+        MotorRecorder recorder = new MotorRecorder(runtime, master, 0.01, telemetry);
+
+        master.clawWrist.setPosition(wristTarget);
+        master.clawServo.setPosition(0);
 
         waitForStart();
+        telemetry.setAutoClear(true);
         runtime.reset();
+        double lastRuntime = runtime.time();
 
         while (opModeIsActive()) {
 
@@ -47,7 +82,7 @@ public class MecanumDrive extends LinearOpMode
             if (gamepad1.right_trigger >= 0.75)
             {
                 telemetry.addData("DUMPING MODE", "active");
-                String filepath = masterHardware.filenameSelect(this);
+                String filepath = master.filenameSelect(this);
                 if (filepath != null)
                 {
                     telemetry.addData("DUMPING MODE", "dumping...");
@@ -60,53 +95,71 @@ public class MecanumDrive extends LinearOpMode
             //region  ------------------------------- Gamepad 2 -------------------------------
             double susanSpeed = 1;
             double wristSpeed = -0.003;
-            double shoulderSpeed = 0.5;
-            double elbowSpeed = 1;
 
             double susanInput = gamepad2.right_trigger - gamepad2.left_trigger;
             double wristInput = (gamepad2.dpad_up ? 1 : 0) - (gamepad2.dpad_down ? 1 : 0);
-            double armInput = gamepad2.left_stick_y;
 
             double susanPower = Math.pow(susanInput * susanSpeed, 3);
-            double shoulderPower = Math.pow(armInput * shoulderSpeed, 3);
-            double elbowPower = Math.pow(armInput * elbowSpeed, 3);
+            double shoulderPower = 0, elbowPower = 0;
 
             wristTarget += wristSpeed * wristInput;
+            wristTarget = Math.min(1, Math.max(0, wristTarget));
 
-            if (wristTarget > 1)
+            if (useArmPID)
             {
-                wristTarget = 1;
+                double armSpeed = -0.003;
+                double armInput = gamepad2.left_stick_y;
+
+                armTarget += armSpeed * armInput;
+                armTarget = Math.min(1, Math.max(0, armTarget));
             }
-            else if (wristTarget < 0)
+            else
             {
-                wristTarget = 0;
+                double shoulderSpeed = 0.5;
+                double elbowSpeed = 1;
+
+                double shoulderInput = gamepad2.left_stick_y;
+                double elbowInput = gamepad2.right_stick_y;
+
+                shoulderPower = shoulderSpeed * shoulderInput;
+                elbowPower = elbowSpeed * elbowInput;
             }
 
             //endregion
 
             //region ----------------------------- Setting Power -----------------------------
-            masterHardware.frontLeft.setPower(flPower);
-            masterHardware.frontRight.setPower(frPower);
-            masterHardware.backLeft.setPower(blPower);
-            masterHardware.backRight.setPower(brPower);
+            master.frontLeft.setPower(flPower);
+            master.frontRight.setPower(frPower);
+            master.backLeft.setPower(blPower);
+            master.backRight.setPower(brPower);
 
-            masterHardware.susan.setPower(susanPower);
-            masterHardware.shoulderJoint.setPower(shoulderPower);
-            masterHardware.elbowJoint.setPower(elbowPower);
+            master.susan.setPower(susanPower);
 
-            masterHardware.clawWrist.setPosition(wristTarget);
+            master.clawWrist.setPosition(wristTarget);
+
+            if (useArmPID)
+            {
+                double deltaTime = runtime.time() - lastRuntime;
+                master.moveArmTowardTarget(armTarget, deltaTime);
+            }
+            else
+            {
+                master.shoulderJoint.setPower(shoulderPower);
+                master.elbowJoint.setPower(elbowPower);
+            }
+            lastRuntime = runtime.time();
 
             if (gamepad2.a && !aDown)
             {
                 aDown = true;
                 if (clawOpen)
                 {
-                    masterHardware.clawServo.setPosition(0.25);
+                    master.clawServo.setPosition(0.25);
                     clawOpen = false;
                 }
                 else
                 {
-                    masterHardware.clawServo.setPosition(0);
+                    master.clawServo.setPosition(0);
                     clawOpen = true;
                 }
             }
@@ -125,12 +178,13 @@ public class MecanumDrive extends LinearOpMode
             telemetry.addData("br", brPower);
             telemetry.addLine();
             telemetry.addData("susan", susanPower);
-            telemetry.addData("shoulder", shoulderPower);
-            telemetry.addData("elbow", elbowPower);
+            telemetry.addData("armTarget", armTarget);
+            telemetry.addData("shoulder", master.shoulderJoint.getPower());
+            telemetry.addData("elbow", master.elbowJoint.getPower());
             telemetry.addLine();
-            telemetry.addData("claw position", masterHardware.clawServo.getPosition());
+            telemetry.addData("claw position", master.clawServo.getPosition());
             telemetry.addData("wristTarget", wristTarget);
-            telemetry.addData("wrist position", masterHardware.clawWrist.getPosition());
+            telemetry.addData("wrist position", master.clawWrist.getPosition());
             telemetry.addLine();
             telemetry.addData("[DEBUG] aDown?", aDown);
             telemetry.addData("[DEBUG] clawOpen?", clawOpen);
