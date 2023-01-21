@@ -58,8 +58,8 @@ public class MecanumMap_Master extends HardwareMap_Master
     public Servo clawWrist;
     public Servo clawServo;     // Servo to open & close claw
 
-    public double shoulderKp = 1, shoulderKi = 0, shoulderKd = 0;
-    public double elbowKp = 1, elbowKi = 0, elbowKd = 0;
+    public double shoulderKp = 0.01, shoulderKi = 0, shoulderKd = 0;
+    public double elbowKp = 0.02, elbowKi = 0, elbowKd = 0;
 
     public double shoulderIntegral = 0, shoulderLastError = 0;
     public double elbowIntegral = 0, elbowLastError = 0;
