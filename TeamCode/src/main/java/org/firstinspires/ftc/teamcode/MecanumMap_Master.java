@@ -30,6 +30,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -58,8 +59,8 @@ public class MecanumMap_Master extends HardwareMap_Master
     public Servo clawWrist;
     public Servo clawServo;     // Servo to open & close claw
 
-    public double shoulderKp = 0.01, shoulderKi = 0, shoulderKd = 0;
-    public double elbowKp = 0.02, elbowKi = 0, elbowKd = 0;
+    public double shoulderKp = 0.001, shoulderKi = 0, shoulderKd = 0;
+    public double elbowKp = 0.002, elbowKi = 0, elbowKd = 0;
 
     public double shoulderIntegral = 0, shoulderLastError = 0;
     public double elbowIntegral = 0, elbowLastError = 0;
@@ -114,6 +115,9 @@ public class MecanumMap_Master extends HardwareMap_Master
         frontRight.setDirection(DcMotor.Direction.REVERSE);
         backLeft.setDirection(DcMotor.Direction.FORWARD);
         backRight.setDirection(DcMotor.Direction.REVERSE);
+
+        shoulderJoint.setDirection(DcMotorSimple.Direction.REVERSE);
+        elbowJoint.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Hardware Initialization
         for (DcMotor m: motors) {
