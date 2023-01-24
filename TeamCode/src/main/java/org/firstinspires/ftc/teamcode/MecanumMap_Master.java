@@ -56,8 +56,10 @@ public class MecanumMap_Master extends HardwareMap_Master
     public DcMotor susan;           // Lazy susan wheel
     public DcMotor shoulderJoint;   // Lower arm hex motor
     public DcMotor elbowJoint;      // Higher arm joint
+    public DcMotor spoolMotor;
     public Servo clawWrist;
     public Servo clawServo;     // Servo to open & close claw
+
 
     public double shoulderKp = 0.000015, shoulderKi = 0, shoulderKd = 0;
     public double elbowKp = 0.00003, elbowKi = 0, elbowKd = 0;
@@ -93,9 +95,9 @@ public class MecanumMap_Master extends HardwareMap_Master
 
         if (!chassisOnly) {
             susan = hwMap.get(DcMotor.class, "susan");
-            shoulderJoint = hwMap.get(DcMotor.class, "shoulder");
-            elbowJoint = hwMap.get(DcMotor.class, "elbow");
-
+            //shoulderJoint = hwMap.get(DcMotor.class, "shoulder");
+            //elbowJoint = hwMap.get(DcMotor.class, "elbow");
+            spoolMotor = hwMap.get(DcMotor.class, "spoolMotor");
             clawWrist = hwMap.get(Servo.class, "clawWrist");
             clawServo = hwMap.get(Servo.class, "clawServo");
 
@@ -106,8 +108,10 @@ public class MecanumMap_Master extends HardwareMap_Master
             motors = new DcMotor[] {frontLeft, frontRight, backLeft, backRight};
         }
         else {
+            //motors = new DcMotor[] {frontLeft, frontRight, backLeft, backRight,
+            //        susan, shoulderJoint, elbowJoint};
             motors = new DcMotor[] {frontLeft, frontRight, backLeft, backRight,
-                    susan, shoulderJoint, elbowJoint};
+                    susan, spoolMotor};
             servos = new Servo[] {clawWrist, clawServo};
         }
 

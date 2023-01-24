@@ -54,9 +54,13 @@ public class SlideController
             {
                 spoolMotor.setPower(input * speed);
             }
-            if(input < 0 && spoolMotor.getCurrentPosition() > minTicks)
+            else if(input < 0 && spoolMotor.getCurrentPosition() > minTicks)
             {
                 spoolMotor.setPower(input * -speed);
+            }
+            else
+            {
+                spoolMotor.setPower(0);
             }
         }
         else

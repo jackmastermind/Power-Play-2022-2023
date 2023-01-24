@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class MecanumDrive extends LinearOpMode
 {
     MecanumMap_Master master = new MecanumMap_Master();
+    SlideController slide = new SlideController();
 
     public void runOpMode()
     {
@@ -19,6 +20,8 @@ public class MecanumDrive extends LinearOpMode
         boolean useArmPID = false;
         double wristTarget = 0.9;
         double armTarget = 0.0; //Only used for PID mode
+
+        slide.Initialize(master.hwMap);
 
         telemetry.setAutoClear(false);
         telemetry.addLine("ARM MODE: Press gamepad1.a to use PID arm mode OR gamepad1.b to use manual controls");
