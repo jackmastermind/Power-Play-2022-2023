@@ -12,8 +12,8 @@ public class TwoJointArmController {
     double j1_desiredPosition; //Joint 1 desired position
     double j2_desiredPosition;
 
-    double j1_Speed;
-    double j2_Speed;
+    double j1_Speed = 527.7/4;
+    double j2_Speed = 527.7/4;
 
     //==== PID VARIABLES =====
     //Proportional constant (counters current error)
