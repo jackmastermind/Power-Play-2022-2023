@@ -14,14 +14,12 @@ public class ArmPIDTuner extends LinearOpMode {
 
     // Declare OpMode members.
     private final ElapsedTime runtime = new ElapsedTime();
-    private final MecanumMap_Master master = new MecanumMap_Master();
+    private final TwoJointArmController arm = new TwoJointArmController();
 
     @Override
     public void runOpMode() {
         //INITIALIZATION CODE
-        double armTarget = 0;
-
-        master.init(hardwareMap);
+        arm.Initialize(hardwareMap);
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
@@ -29,90 +27,46 @@ public class ArmPIDTuner extends LinearOpMode {
         double lastRuntime = runtime.time();
 
         while (opModeIsActive()) {
-            if (gamepad2.right_trigger > 0.5)
+            
+            double tuneSpeed = 0.001;
+            
+            if (gamepad1.dpad_up) {
+                arm.Kp += tuneSpeed;
+            }
+            else if (gamepad1.dpad_down)
             {
-                telemetry.addData("tweaking", "elbow");
-
-                if (gamepad1.dpad_up) {
-                    master.elbowKp += 0.001;
-                }
-                else if (gamepad1.dpad_down)
-                {
-                    master.elbowKp -= 0.001;
-                }
-
-                if (gamepad1.dpad_right)
-                {
-                    master.elbowKd += 0.001;
-                }
-                else if (gamepad1.dpad_left)
-                {
-                    master.elbowKd -= 0.001;
-                }
-
-                if (gamepad1.right_bumper)
-                {
-                    master.elbowKi += 0.001;
-                }
-                else if (gamepad1.left_bumper)
-                {
-                    master.elbowKi -= 0.001;
-                }
+                arm.Kp -= tuneSpeed;
             }
-            else {
-                telemetry.addData("tweaking", "shoulder");
-
-                if (gamepad1.dpad_up) {
-                    master.shoulderKp += 0.001;
-                }
-                else if (gamepad1.dpad_down)
-                {
-                    master.shoulderKp -= 0.001;
-                }
-
-                if (gamepad1.dpad_right)
-                {
-                    master.shoulderKd += 0.001;
-                }
-                else if (gamepad1.dpad_left)
-                {
-                    master.shoulderKd -= 0.001;
-                }
-
-                if (gamepad1.right_bumper)
-                {
-                    master.shoulderKi += 0.001;
-                }
-                else if (gamepad1.left_bumper)
-                {
-                    master.shoulderKi -= 0.001;
-                }
+            if (gamepad1.dpad_right)
+            {
+                arm.Kd += tuneSpeed;
             }
-
-
-            double armSpeed = -0.003;
-            double armInput = gamepad2.left_stick_y;
-
-            armTarget += armSpeed * armInput;
-            armTarget = Math.min(1, Math.max(0, armTarget));
+            else if (gamepad1.dpad_left)
+            {
+                arm.Kd -= tuneSpeed;
+            }
+            if (gamepad1.right_bumper)
+            {
+                arm.Ki += tuneSpeed;
+            }
+            else if (gamepad1.left_bumper)
+            {
+                arm.Ki -= tuneSpeed;
+            }
 
             double dt = runtime.time() - lastRuntime;
+            arm.SetPower(gamepad1, dt, telemetry);
+            lastRuntime = runtime.time();
 
-            master.moveArmTowardTarget(armTarget, dt);
-
-            telemetry.addData("shoulderKp", master.shoulderKp);
-            telemetry.addData("shoulderKi", master.shoulderKi);
-            telemetry.addData("shoulderKd", master.shoulderKd);
+            telemetry.addData("Kp", arm.Kp);
+            telemetry.addData("Ki", arm.Ki);
+            telemetry.addData("Kd", arm.Kd);
             telemetry.addLine();
-            telemetry.addData("elbowKp", master.elbowKp);
-            telemetry.addData("elbowKi", master.elbowKi);
-            telemetry.addData("elbowKd", master.elbowKd);
+            telemetry.addData("shoulderPow", arm.motorJoint1.getPower());
+            telemetry.addData("shoulderPos", arm.motorJoint1.getCurrentPosition());
             telemetry.addLine();
-            telemetry.addData("shoulderPow", master.shoulderJoint.getPower());
-            telemetry.addData("shoulderPos", master.shoulderJoint.getCurrentPosition());
-            telemetry.addLine();
-            telemetry.addData("elbowPow", master.elbowJoint.getPower());
-            telemetry.addData("elbowPos", master.elbowJoint.getCurrentPosition());
+            telemetry.addData("elbowPow", arm.motorJoint2.getPower());
+            telemetry.addData("elbowPos", arm.motorJoint2.getCurrentPosition());
             telemetry.update();
 
         }

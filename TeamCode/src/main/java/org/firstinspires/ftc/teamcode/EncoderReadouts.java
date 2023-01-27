@@ -15,6 +15,7 @@ public class EncoderReadouts extends LinearOpMode {
     // Declare OpMode members.
     private final ElapsedTime runtime = new ElapsedTime();
     private final MecanumMap_Master master = new MecanumMap_Master();
+    private final TwoJointArmController arm = new TwoJointArmController();
 
     @Override
     public void runOpMode() {
@@ -35,8 +36,8 @@ public class EncoderReadouts extends LinearOpMode {
             telemetry.addData("backLeft", master.backLeft.getCurrentPosition());
             telemetry.addData("backRight", master.backRight.getCurrentPosition());
             telemetry.addLine();
-            telemetry.addData("shoulder", master.shoulderJoint.getCurrentPosition());
-            telemetry.addData("elbow", master.elbowJoint.getCurrentPosition());
+            telemetry.addData("shoulder", arm.motorJoint1.getCurrentPosition());
+            telemetry.addData("elbow", arm.motorJoint2.getCurrentPosition());
             telemetry.addLine();
             telemetry.addData("clawServo", master.clawServo.getPosition());
             telemetry.addData("clawWrist", master.clawWrist.getPosition());
