@@ -53,17 +53,10 @@ public class MecanumMap_Master extends HardwareMap_Master
     public DcMotor backRight;
     public DcMotor[] driveMotors;
 
-    public DcMotor susan;           // Lazy susan wheel
-    public DcMotor shoulderJoint;   // Lower arm hex motor
-    public DcMotor elbowJoint;      // Higher arm joint
+    public DcMotor susan;       // Lazy susan wheel
     public Servo clawWrist;
     public Servo clawServo;     // Servo to open & close claw
 
-    public double shoulderKp = 0.000015, shoulderKi = 0, shoulderKd = 0;
-    public double elbowKp = 0.00003, elbowKi = 0, elbowKd = 0;
-
-    public double shoulderIntegral = 0, shoulderLastError = 0;
-    public double elbowIntegral = 0, elbowLastError = 0;
 
     public static final double WHEEL_CIRCUMFERENCE_INCHES = 4 * Math.PI;
     public static final double TICKS_PER_ROTATION = 537.7;
@@ -73,9 +66,6 @@ public class MecanumMap_Master extends HardwareMap_Master
     public static final double AUTO_DRIVE_SPEED = 0.5;
     public static final double CLAW_CLOSED_POSITION = 0.6;
     public static final double CLAW_OPEN_POSITION = 0.8;
-
-    // SHOULDER needs to turn 120
-    // ELBOW needs to turn 60
 
     /* Initialize standard Hardware interfaces */
     @Override
@@ -93,12 +83,8 @@ public class MecanumMap_Master extends HardwareMap_Master
 
         if (!chassisOnly) {
             susan = hwMap.get(DcMotor.class, "susan");
-            shoulderJoint = hwMap.get(DcMotor.class, "shoulder");
-            elbowJoint = hwMap.get(DcMotor.class, "elbow");
-
             clawWrist = hwMap.get(Servo.class, "clawWrist");
             clawServo = hwMap.get(Servo.class, "clawServo");
-
         }
 
         if (chassisOnly)
@@ -107,7 +93,7 @@ public class MecanumMap_Master extends HardwareMap_Master
         }
         else {
             motors = new DcMotor[] {frontLeft, frontRight, backLeft, backRight,
-                    susan, shoulderJoint, elbowJoint};
+                    susan};
             servos = new Servo[] {clawWrist, clawServo};
         }
 
@@ -115,8 +101,6 @@ public class MecanumMap_Master extends HardwareMap_Master
         frontRight.setDirection(DcMotor.Direction.REVERSE);
         backLeft.setDirection(DcMotor.Direction.FORWARD);
         backRight.setDirection(DcMotor.Direction.REVERSE);
-
-        shoulderJoint.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Hardware Initialization
         for (DcMotor m: motors) {
@@ -223,22 +207,6 @@ public class MecanumMap_Master extends HardwareMap_Master
         }
     }
 
-    public static void runMotorToPosition(DcMotor motor, int position, double power)
-    {
-        motor.setTargetPosition(position);
-        motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        motor.setPower(power);
-
-        while (motor.isBusy())
-        {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     public void openClaw()
     {
         clawServo.setPosition(CLAW_OPEN_POSITION);
@@ -249,42 +217,5 @@ public class MecanumMap_Master extends HardwareMap_Master
         clawServo.setPosition(CLAW_CLOSED_POSITION);
     }
 
-
-    public void moveArmTowardTarget(double armTarget, double dt) //position in range [0, 1]
-    {
-        //https://www.desmos.com/calculator/l9crojrbiw
-        assert armTarget >= 0 && armTarget <= 1;
-
-        double shoulderError = calcShoulderTarget(armTarget) - shoulderJoint.getCurrentPosition();
-        double elbowError = calcElbowTarget(armTarget) - elbowJoint.getCurrentPosition();
-
-        //Shoulder PID
-        double shoulderP = shoulderKp * shoulderError;
-        shoulderIntegral += shoulderKi * shoulderError * dt;
-        double shoulderD = shoulderKd * (shoulderError - shoulderLastError) / dt;
-
-        shoulderJoint.setPower(shoulderP + shoulderIntegral + shoulderD);
-        shoulderLastError = shoulderError;
-
-        //Elbow PID
-        double elbowP = elbowKp * elbowError;
-        elbowIntegral += elbowKi * elbowError * dt;
-        double elbowD = elbowKd * (elbowError - elbowLastError) / dt;
-
-        elbowJoint.setPower(elbowP + elbowIntegral + elbowD);
-        elbowLastError = elbowError;
-    }
-
-    private double calcShoulderTarget(double armTarget)
-    {
-        //https://www.desmos.com/calculator/l9crojrbiw
-        return -378 * Math.pow(armTarget, 2) + 525.6 * armTarget + 126.2;
-    }
-
-    private double calcElbowTarget(double armTarget)
-    {
-        //https://www.desmos.com/calculator/l9crojrbiw
-        return 24.8212 * Math.sin(5.86558 * (armTarget - 0.0803716)) - 97.7273;
-    }
  }
 
