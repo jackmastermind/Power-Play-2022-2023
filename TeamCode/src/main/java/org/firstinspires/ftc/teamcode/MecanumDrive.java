@@ -115,8 +115,8 @@ public class MecanumDrive extends LinearOpMode
             }
             else
             {
-                double shoulderSpeed = 0.4;
-                double elbowSpeed = 0.5;
+                double shoulderSpeed = 0.85;
+                double elbowSpeed = 0.7;
 
                 double shoulderInput = gamepad2.left_stick_y;
                 double elbowInput = gamepad2.right_stick_y;
