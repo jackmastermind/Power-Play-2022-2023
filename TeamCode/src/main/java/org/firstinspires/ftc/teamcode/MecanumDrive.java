@@ -8,7 +8,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class MecanumDrive extends LinearOpMode
 {
     MecanumMap_Master master = new MecanumMap_Master();
-    SlideController slide = new SlideController();
+    //SlideController slide = new SlideController();
+    TwoJointArmController arm = new TwoJointArmController();
 
     public void runOpMode()
     {
@@ -21,7 +22,8 @@ public class MecanumDrive extends LinearOpMode
         double wristTarget = 0.9;
         double armTarget = 0.0; //Only used for PID mode
 
-        slide.Initialize(master.hwMap);
+        //slide.Initialize(master.hwMap);
+        arm.Initialize(master.hwMap);
 
         telemetry.setAutoClear(false);
         telemetry.addLine("ARM MODE: Press gamepad1.a to use PID arm mode OR gamepad1.b to use manual controls");
@@ -63,6 +65,8 @@ public class MecanumDrive extends LinearOpMode
         double lastRuntime = runtime.time();
 
         while (opModeIsActive()) {
+
+            double deltaTime = runtime.time() - lastRuntime;
 
             //region  ------------------------------- Gamepad 1 -------------------------------
             double powerMultiplier = 0.5;
@@ -110,11 +114,13 @@ public class MecanumDrive extends LinearOpMode
 
             if (useArmPID)
             {
-                double armSpeed = -0.003;
+                double armSpeed = -0.5;
                 double armInput = gamepad2.left_stick_y;
 
-                armTarget += armSpeed * armInput;
-                armTarget = Math.min(1, Math.max(0, armTarget));
+                //armTarget += armSpeed * armInput;
+                //armTarget = Math.min(1, Math.max(0, armTarget));
+
+                arm.SetPower(gamepad1, deltaTime, armSpeed);
             }
             else
             {
@@ -142,7 +148,6 @@ public class MecanumDrive extends LinearOpMode
 
             if (useArmPID)
             {
-                double deltaTime = runtime.time() - lastRuntime;
                 master.moveArmTowardTarget(armTarget, deltaTime);
             }
             else
@@ -193,6 +198,8 @@ public class MecanumDrive extends LinearOpMode
             telemetry.addData("[DEBUG] clawOpen?", clawOpen);
             telemetry.update();
             //endregion
+
+            lastRuntime = runtime.time();  //Set last runtime to current runtime
         }
     }
 }
