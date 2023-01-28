@@ -25,6 +25,7 @@ public class EncoderReadouts extends LinearOpMode {
         waitForStart();
         runtime.reset();
         master.init(hardwareMap);
+        arm.Initialize(hardwareMap);
         //RUN ONE TIME CODE HERE
 
         // run until the end of the match (driver presses STOP)
