@@ -7,14 +7,13 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @TeleOp(name="Mecanum Drive")
 public class MecanumDrive extends LinearOpMode
 {
-    MecanumMap_Master master = new MecanumMap_Master();
+    private final MecanumMap_Master master = new MecanumMap_Master();
+    private final ElapsedTime runtime = new ElapsedTime();
     //SlideController slide = new SlideController();
-    TwoJointArmController arm = new TwoJointArmController();
+    private final TwoJointArmController arm = new TwoJointArmController();
 
     public void runOpMode()
     {
-        ElapsedTime runtime = new ElapsedTime();
-
         boolean clawOpen = true;
         boolean aDown = false;
         boolean armModeChosen = false;
@@ -66,8 +65,6 @@ public class MecanumDrive extends LinearOpMode
 
         while (opModeIsActive()) {
 
-            double deltaTime = runtime.time() - lastRuntime;
-
             //region  ------------------------------- Gamepad 1 -------------------------------
             double powerMultiplier = 0.5;
             if (gamepad1.left_bumper) {
@@ -112,6 +109,8 @@ public class MecanumDrive extends LinearOpMode
             wristTarget += wristSpeed * wristInput;
             wristTarget = Math.min(1, Math.max(0, wristTarget));
 
+            double deltaTime = runtime.time() - lastRuntime;
+
             if (useArmPID)
             {
                 arm.SetPower(gamepad1, deltaTime);
@@ -130,6 +129,7 @@ public class MecanumDrive extends LinearOpMode
                 arm.motorJoint1.setPower(shoulderPower);
                 arm.motorJoint2.setPower(elbowPower);
             }
+            lastRuntime = runtime.time();  //Set last runtime to current runtime
 
             //endregion
 
@@ -184,8 +184,6 @@ public class MecanumDrive extends LinearOpMode
             telemetry.addData("[DEBUG] clawOpen?", clawOpen);
             telemetry.update();
             //endregion
-
-            lastRuntime = runtime.time();  //Set last runtime to current runtime
         }
     }
 }
