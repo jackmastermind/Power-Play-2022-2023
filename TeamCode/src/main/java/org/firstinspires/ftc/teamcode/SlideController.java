@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 /**
  * SLIDE CONTROLLER
  * Class for storing methods used for the operating an x-rail slide
@@ -22,7 +24,7 @@ public class SlideController
     double maxTicks = 0;
     public boolean ignoreMinMax = false;
 
-    public void Initialize(HardwareMap hardwareMap)
+    public void init(HardwareMap hardwareMap)
     {
         spoolMotor = hardwareMap.get(DcMotor.class, "spoolMotor");
 
@@ -68,6 +70,15 @@ public class SlideController
             //Ignore limits
             spoolMotor.setPower(input*spoolSpeed);
         }
+    }
+
+
+    public void LogValues(Telemetry telemetry)
+    {
+        telemetry.addLine("Slide Debug Output");
+        telemetry.addData("Slide Motor Position", spoolMotor.getCurrentPosition());
+        telemetry.addData("Min", minTicks);
+        telemetry.addData("Max", maxTicks);
     }
 }
 
