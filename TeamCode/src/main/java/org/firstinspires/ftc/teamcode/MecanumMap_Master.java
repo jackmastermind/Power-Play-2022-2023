@@ -67,6 +67,8 @@ public class MecanumMap_Master extends HardwareMap_Master
 
     public static final double TILE_WIDTH = 23.5;
     public static final double AUTO_DRIVE_SPEED = 0.5;
+    public static final double CLAW_CLOSED_POSITION = 0.6;
+    public static final double CLAW_OPEN_POSITION = 0.8;
 
     /* Initialize standard Hardware interfaces */
     @Override
@@ -206,6 +208,16 @@ public class MecanumMap_Master extends HardwareMap_Master
         for (DcMotor motor: motors) {
             motor.setTargetPosition(position);
         }
+    }
+
+    public void openClaw()
+    {
+        clawServo.setPosition(CLAW_OPEN_POSITION);
+    }
+
+    public void closeClaw()
+    {
+        clawServo.setPosition(CLAW_CLOSED_POSITION);
     }
 
     public void drive(Gamepad gamepad, double speed, boolean useCubicControls)
