@@ -5,15 +5,12 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.sun.tools.javac.util.ArrayUtils;
-
-import java.util.Arrays;
 
 @TeleOp(name="Master Drive")
 @SuppressWarnings("FieldCanBeLocal")
 public class MasterDrive extends LinearOpMode
 {
-    private final MecanumMap_Master master = new MecanumMap_Master();
+    private final MecanumMap_Master mecanum = new MecanumMap_Master();
     private SlideController slide;
     private ClawController clawController;
     private SusanController susanController;
@@ -34,13 +31,13 @@ public class MasterDrive extends LinearOpMode
     public void runOpMode()
     {
         //INITIALIZE OBJECTS
-        master.init(hardwareMap);
+        mecanum.init(hardwareMap);
         slide = new SlideController(hardwareMap);
         clawController = new ClawController(hardwareMap);
         susanController = new SusanController(hardwareMap);
 
-        motors = new DcMotor[]{master.frontLeft, master.frontRight,
-                master.backLeft, master.backRight, slide.spoolMotor, susanController.susan};
+        motors = new DcMotor[]{mecanum.frontLeft, mecanum.frontRight,
+                mecanum.backLeft, mecanum.backRight, slide.spoolMotor, susanController.susan};
         servos = new Servo[]{clawController.claw, clawController.wrist};
 
         MotorRecorder recorder = new MotorRecorder(runtime, hardwareMap, motors,
@@ -59,26 +56,14 @@ public class MasterDrive extends LinearOpMode
             double deltaTime = runtime.time() - lastRuntime;
 
             //region DRIVE SECTION
-            double powerMultiplier = 0.5;
-
-            double inputLX = gamepad1.left_stick_x;
-            double inputLY = gamepad1.left_stick_y;
-            double inputRX = gamepad1.right_stick_x;
-
-            double normalization = Math.max(Math.abs(inputLX) + Math.abs(inputLY) + Math.abs(inputRX), 1.0);
-
-            double flPower = Math.pow(((-inputLX + inputLY) - inputRX)/ normalization, 3) * powerMultiplier;
-            double blPower = Math.pow(((inputLX + inputLY) - inputRX)/ normalization, 3) * powerMultiplier;
-
-            double frPower = Math.pow(((inputLX + inputLY) + inputRX)/ normalization, 3) * powerMultiplier;
-            double brPower = Math.pow(((-inputLX + inputLY) + inputRX)/ normalization, 3) * powerMultiplier;
+            mecanum.drive(gamepad1);
             //endregion
 
             //region RECORDING DUMP
             if (gamepad1.right_trigger >= 0.75)
             {
                 telemetry.addData("DUMPING MODE", "active");
-                String filepath = master.filenameSelect(this);
+                String filepath = mecanum.filenameSelect(this);
                 if (filepath != null)
                 {
                     telemetry.addData("DUMPING MODE", "dumping...");
@@ -110,20 +95,9 @@ public class MasterDrive extends LinearOpMode
                     susanSpeed);
             //endregion
 
-
-            //region SET POWER
-            master.frontLeft.setPower(flPower);
-            master.frontRight.setPower(frPower);
-            master.backLeft.setPower(blPower);
-            master.backRight.setPower(brPower);
-            //endregion
-
             //region TELEMETRY
             telemetry.addLine("DRIVE MOTORS");
-            telemetry.addData("fl", flPower);
-            telemetry.addData("fr", frPower);
-            telemetry.addData("bl", blPower);
-            telemetry.addData("br", brPower);
+            mecanum.LogValues(telemetry);
             telemetry.addLine("OPERATOR MOTORS");
             clawController.LogValues(telemetry);
             slide.LogValues(telemetry);
