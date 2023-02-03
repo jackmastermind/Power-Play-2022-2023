@@ -31,24 +31,45 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Autonomous(name="Playback Op")
-public class MecanumPlaybackOp extends LinearOpMode {
+@Autonomous(name="Master Playback Op")
+@SuppressWarnings("FieldCanBeLocal")
+public class MasterPlaybackOp extends LinearOpMode {
 
+    private final MecanumMap_Master mecanum = new MecanumMap_Master();
     private final ElapsedTime runtime = new ElapsedTime();
-    private final MecanumMap_Master master = new MecanumMap_Master();
+
+    private SlideController slide;
+    private ClawController clawController;
+    private SusanController susanController;
+
+    private DcMotor[] motors;
+    private Servo[] servos;
 
     @Override
     public void runOpMode() {
-        master.init(hardwareMap);
         telemetry.setAutoClear(false);
+
+        mecanum.init(hardwareMap);
+        slide           = new SlideController(hardwareMap);
+        clawController  = new ClawController(hardwareMap);
+        susanController = new SusanController(hardwareMap);
+
+        motors = new DcMotor[] {mecanum.frontLeft, mecanum.frontRight,
+                                mecanum.backLeft, mecanum.backRight,
+                                slide.spoolMotor, susanController.susan};
+        servos = new Servo[]   {clawController.claw, clawController.wrist};
+
         telemetry.addData("Status", "waiting for recording select...");
         telemetry.update();
+
         String filepath;
         while (true)
         {
-            filepath = master.filenameSelect(this);
+            filepath = mecanum.filenameSelect(this);
             if (filepath != null) {
                 telemetry.addData("Status", filepath + " selected");
                 break;
@@ -61,9 +82,13 @@ public class MecanumPlaybackOp extends LinearOpMode {
             }
         }
         telemetry.update();
+
         telemetry.addData("Status", "loading...");
         telemetry.update();
-        MotorPlayback playback = new MotorPlayback(filepath, runtime, master, telemetry);
+
+        MotorPlayback playback = new MotorPlayback(filepath, runtime, hardwareMap,
+                                                   motors, servos, telemetry);
+
         telemetry.addData("Status", "all set!");
         telemetry.update();
 
