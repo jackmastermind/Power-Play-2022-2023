@@ -2,26 +2,30 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.sun.tools.javac.util.ArrayUtils;
+
+import java.util.Arrays;
 
 @TeleOp(name="Master Drive")
+@SuppressWarnings("FieldCanBeLocal")
 public class MasterDrive extends LinearOpMode
 {
     private final MecanumMap_Master master = new MecanumMap_Master();
-    private final SlideController slide = new SlideController();
-    //Todo: Make Claw Controller Class
-    //Todo: Make Suzan Controller Class
+    private SlideController slide;
+    private ClawController clawController;
+    private SusanController susanController;
 
+    private DcMotor[] motors;
+    private Servo[] servos;
 
     //MOTOR VARIABLES
     double armSpeed = 1;
-    double wristSpeed = -0.003;
-    double clawSpeed = 1;
+    double clawSpeed = 0.003;
     double susanSpeed = 1;
-    double wristTarget = 0.9;
-    double armTarget = 0.0;
 
-    boolean clawOpen = true;
     boolean aDown = false;
 
 
@@ -29,14 +33,20 @@ public class MasterDrive extends LinearOpMode
 
     public void runOpMode()
     {
-
-        MotorRecorder recorder = new MotorRecorder(runtime, master, 0.01, telemetry);
-
         //INITIALIZE OBJECTS
         master.init(hardwareMap);
-        slide.init(hardwareMap);
+        slide = new SlideController(hardwareMap);
+        clawController = new ClawController(hardwareMap);
+        susanController = new SusanController(hardwareMap);
 
-        slide.ignoreMinMax = true; //Todo: Remove this once min max are deterined
+        motors = new DcMotor[]{master.frontLeft, master.frontRight,
+                master.backLeft, master.backRight, slide.spoolMotor, susanController.susan};
+        servos = new Servo[]{clawController.claw, clawController.wrist};
+
+        MotorRecorder recorder = new MotorRecorder(runtime, hardwareMap, motors,
+                servos, 0.1, telemetry);
+
+        slide.ignoreMinMax = true; //Todo: Remove this once min max are determined
 
         waitForStart();
         telemetry.setAutoClear(true);
@@ -48,7 +58,7 @@ public class MasterDrive extends LinearOpMode
         {
             double deltaTime = runtime.time() - lastRuntime;
 
-            //DRIVE SECTION
+            //region DRIVE SECTION
             double powerMultiplier = 0.5;
 
             double inputLX = gamepad1.left_stick_x;
@@ -62,8 +72,9 @@ public class MasterDrive extends LinearOpMode
 
             double frPower = Math.pow(((inputLX + inputLY) + inputRX)/ normalization, 3) * powerMultiplier;
             double brPower = Math.pow(((-inputLX + inputLY) + inputRX)/ normalization, 3) * powerMultiplier;
+            //endregion
 
-            //RECORDING DUMP
+            //region RECORDING DUMP
             if (gamepad1.right_trigger >= 0.75)
             {
                 telemetry.addData("DUMPING MODE", "active");
@@ -75,72 +86,50 @@ public class MasterDrive extends LinearOpMode
                     telemetry.addData("DUMPING MODE", "complete!");
                 }
             }
+            //endregion
 
-            //OPERATING SECTION
+            //region OPERATING SECTION
 
             //Arm
-            double armInput = gamepad2.left_stick_y;
-            slide.MoveSlide(armInput, armSpeed);
+            slide.MoveSlide(gamepad2.left_stick_y, armSpeed);
 
             //Wrist
-            double wristInput = gamepad2.right_stick_y;
-            wristTarget += wristSpeed * wristInput;
-            wristTarget = Math.min(1, Math.max(0, wristTarget));
+            clawController.moveWrist(gamepad2.right_stick_y, clawSpeed);
 
             //Claw
             if (gamepad2.a && !aDown)
             {
-                aDown = true;
-                if (clawOpen)
-                {
-                    master.clawServo.setPosition(0.25);
-                    clawOpen = false;
-                }
-                else
-                {
-                    master.clawServo.setPosition(0);
-                    clawOpen = true;
-                }
+               clawController.toggleClaw();
             }
             else if (!gamepad2.a){
                 aDown = false;
             }
 
             //Susan
-            double susanInput = gamepad2.right_trigger - gamepad2.left_trigger;
-            double susanPower = Math.pow(susanInput * susanSpeed, 3);
+            susanController.moveSusan(gamepad2.right_trigger - gamepad2.left_trigger,
+                    susanSpeed);
+            //endregion
 
 
-            //SET POWER
+            //region SET POWER
             master.frontLeft.setPower(flPower);
             master.frontRight.setPower(frPower);
             master.backLeft.setPower(blPower);
             master.backRight.setPower(brPower);
+            //endregion
 
-            master.susan.setPower(susanPower);
-
-            master.clawWrist.setPosition(wristTarget);
-
-
-            //TELEMETRY
+            //region TELEMETRY
             telemetry.addLine("DRIVE MOTORS");
             telemetry.addData("fl", flPower);
             telemetry.addData("fr", frPower);
             telemetry.addData("bl", blPower);
             telemetry.addData("br", brPower);
             telemetry.addLine("OPERATOR MOTORS");
-            telemetry.addData("susan", susanPower);
-            telemetry.addData("armTarget", armTarget);
-            //telemetry.addData("shoulder", arm.motorJoint1.getPower());
-            //telemetry.addData("elbow", arm.motorJoint2.getPower());
-            telemetry.addLine();
-            telemetry.addData("claw position", master.clawServo.getPosition());
-            telemetry.addData("wristTarget", wristTarget);
-            telemetry.addData("wrist position", master.clawWrist.getPosition());
-            telemetry.addLine();
-            telemetry.addData("[DEBUG] aDown?", aDown);
-            telemetry.addData("[DEBUG] clawOpen?", clawOpen);
+            clawController.LogValues(telemetry);
+            slide.LogValues(telemetry);
+            susanController.LogValues(telemetry);
             telemetry.update();
+            //endregion
 
             lastRuntime = runtime.time();  //Set last runtime to current runtime
         }

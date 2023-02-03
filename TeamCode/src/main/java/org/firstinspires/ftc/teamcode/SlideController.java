@@ -17,14 +17,12 @@ public class SlideController
     //Motor for controlling the spool
     public DcMotor spoolMotor;
 
-    public double spoolSpeed = 0.4; //Todo: Test this
-
     //Values to limit how much the slide will extend
     double minTicks = 0;
     double maxTicks = 0;
     public boolean ignoreMinMax = false;
 
-    public void init(HardwareMap hardwareMap)
+    public SlideController(HardwareMap hardwareMap)
     {
         spoolMotor = hardwareMap.get(DcMotor.class, "spoolMotor");
 
@@ -58,7 +56,7 @@ public class SlideController
             }
             else if(input < 0 && spoolMotor.getCurrentPosition() > minTicks)
             {
-                spoolMotor.setPower(input * -speed);
+                spoolMotor.setPower(input * speed);
             }
             else
             {
@@ -68,7 +66,7 @@ public class SlideController
         else
         {
             //Ignore limits
-            spoolMotor.setPower(input*spoolSpeed);
+            spoolMotor.setPower(input * speed);
         }
     }
 
