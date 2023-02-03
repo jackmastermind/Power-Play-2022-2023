@@ -31,8 +31,11 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 /**
     MASTER HARDWARE MAP
@@ -217,5 +220,61 @@ public class MecanumMap_Master extends HardwareMap_Master
         clawServo.setPosition(CLAW_CLOSED_POSITION);
     }
 
+    public void drive(Gamepad gamepad, double speed, boolean useCubicControls)
+    {
+        double inputLX = gamepad.left_stick_x;
+        double inputLY = gamepad.left_stick_y;
+        double inputRX = gamepad.right_stick_x;
+
+        double normalization = Math.max(Math.abs(inputLX) + Math.abs(inputLY) + Math.abs(inputRX),
+                                        1.0);
+
+        double flPower = ((-inputLX + inputLY) - inputRX)/ normalization;
+        double blPower = ((inputLX + inputLY) - inputRX) / normalization;
+
+        double frPower = ((inputLX + inputLY) + inputRX) / normalization;
+        double brPower = ((-inputLX + inputLY) + inputRX)/ normalization;
+
+        if (useCubicControls)
+        {
+            flPower = Math.pow(flPower, 3);
+            frPower = Math.pow(frPower, 3);
+            blPower = Math.pow(blPower, 3);
+            brPower = Math.pow(brPower, 3);
+        }
+
+        flPower *= speed;
+        frPower *= speed;
+        blPower *= speed;
+        brPower *= speed;
+
+        frontLeft.setPower(flPower);
+        frontRight.setPower(frPower);
+        backLeft.setPower(blPower);
+        backRight.setPower(brPower);
+    }
+
+    public void drive(Gamepad gamepad, double speed)
+    {
+        drive(gamepad, speed, true);
+    }
+
+    public void drive(Gamepad gamepad, boolean useCubicControls)
+    {
+        drive(gamepad, 1, useCubicControls);
+    }
+
+    public void drive(Gamepad gamepad)
+    {
+        drive(gamepad, 1);
+    }
+
+    public void LogValues(Telemetry telemetry)
+    {
+        telemetry.addData("fl", frontLeft.getPower());
+        telemetry.addData("fr", frontRight.getPower());
+        telemetry.addData("bl", backLeft.getPower());
+        telemetry.addData("br", backRight.getPower());
+    }
  }
 
