@@ -24,6 +24,7 @@ public class MotorSnapshot implements Serializable {
 
     private final double timestamp;                //Holds the time of construction.
     private final double[] powerLevels;            //Holds the getPower() value of a group of motors.
+    private final int[] encoderPositions;
     private final double[] servoPositions;         //Holds the getPosition() value of a group of servos.
 
     /**
@@ -36,11 +37,13 @@ public class MotorSnapshot implements Serializable {
     public MotorSnapshot(double timestamp, DcMotor[] motors, Servo[] servos) {
         this.timestamp = timestamp;
         this.powerLevels = new double[motors.length];
+        this.encoderPositions = new int[motors.length];
         this.servoPositions = new double[servos.length];
 
         //Loops through motors, adding each power level to the powerLevels array.
         for (int i = 0; i < motors.length; i++) {
             this.powerLevels[i] = motors[i].getPower();
+            this.encoderPositions[i] = motors[i].getCurrentPosition();
         }
 
         //Loops through servos, adding each servo position to the servoPositions array.
@@ -61,9 +64,11 @@ public class MotorSnapshot implements Serializable {
      * @param servoPositions The positions of the servos, passed directly instead of accessed via
      *                       getPosition().
      */
-    public MotorSnapshot(double timestamp, double[] powerLevels, double[] servoPositions) {
+    public MotorSnapshot(double timestamp, double[] powerLevels,
+                         int[] encoderPositions, double[] servoPositions) {
         this.timestamp = timestamp;
         this.powerLevels = powerLevels;
+        this.encoderPositions = encoderPositions;
         this.servoPositions = servoPositions;
     }
 
@@ -83,6 +88,10 @@ public class MotorSnapshot implements Serializable {
      */
     public double[] getPowerLevels() {
         return powerLevels;
+    }
+
+    public int[] getEncoderPositions() {
+        return encoderPositions;
     }
 
     /**

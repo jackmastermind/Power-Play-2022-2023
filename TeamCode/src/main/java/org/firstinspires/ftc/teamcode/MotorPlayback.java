@@ -38,6 +38,8 @@ public class MotorPlayback {
     private MotorSnapshot nextSnapshot;           //The next snapshot to play.
     private boolean finished;                     //Has the MotorPlayback run through all its data?
 
+    private final double Kp = 1.0 / 537.7;
+
     /**
      * Construct a new MotorPlayback object with a HardwareMap_Master.
      *
@@ -204,9 +206,7 @@ public class MotorPlayback {
     //Set all motors to the power level of the current snapshot & set all servos to the position of
     //the current snapshot
     private void playNext() {
-        for (int i = 0; i < motors.length; i++) {
-            motors[i].setPower(nextSnapshot.getPowerLevels()[i]);
-        }
+        playNextEncoder();
 
         for (int i = 0; i < servos.length; i++) {
             servos[i].setPosition(nextSnapshot.getServoPositions()[i]);
@@ -220,6 +220,22 @@ public class MotorPlayback {
         }
         else {
             finished = true;
+        }
+    }
+
+    private void playNextPower()
+    {
+        for (int i = 0; i < motors.length; i++) {
+            motors[i].setPower(nextSnapshot.getPowerLevels()[i]);
+        }
+    }
+
+    private void playNextEncoder()
+    {
+        for (int i = 0; i < motors.length; i++) {
+            int error = nextSnapshot.getEncoderPositions()[i] - motors[i].getCurrentPosition();
+
+            motors[i].setPower(Kp * error);
         }
     }
 
