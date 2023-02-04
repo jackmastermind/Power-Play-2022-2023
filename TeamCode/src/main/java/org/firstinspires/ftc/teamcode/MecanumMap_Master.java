@@ -63,7 +63,7 @@ public class MecanumMap_Master extends HardwareMap_Master
 
     public static final double WHEEL_CIRCUMFERENCE_INCHES = 4 * Math.PI;
     public static final double TICKS_PER_ROTATION = 537.7;
-    public static final double ROBOT_DIAMETER_INCHES = 24.456; //TODO: Update
+    public static final double ROBOT_DIAMETER_INCHES = 21.375;
 
     public static final double TILE_WIDTH = 23.5;
     public static final double AUTO_DRIVE_SPEED = 0.5;

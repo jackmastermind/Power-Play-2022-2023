@@ -43,7 +43,6 @@ public class DiffSwerve {
         rightTop = hardwareMap.get(DcMotor.class, "rightTop");
         rightBottom = hardwareMap.get(DcMotor.class, "rightBottom");
         motors = new DcMotor[] {leftTop, leftBottom, rightTop, rightBottom};
-        //TODO: SOMETHING TO ZERO THE PODS HERE
 
         for (DcMotor motor: motors) {
             motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
