@@ -44,8 +44,6 @@ public class MasterDrive extends LinearOpMode
 
         MotorRecorder recorder = new MotorRecorder(runtime, hardwareMap, motors,
                                                    servos, 0.1, telemetry);
-
-        slide.ignoreMinMax = true; //Todo: Remove this once min max are determined
         //endregion
 
         waitForStart();
