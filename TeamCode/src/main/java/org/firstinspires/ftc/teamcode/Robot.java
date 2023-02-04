@@ -4,6 +4,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -11,6 +12,15 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+
+// For Qr Code Reader
+import org.openftc.apriltag.AprilTagDetection;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
+
+import java.util.ArrayList;
+
 
 /**
  * The Robot class is a child of HardwareMap_Master, and provides several functions that control
@@ -23,10 +33,38 @@ public class Robot extends HardwareMap_Master {
 
     private BNO055IMU imu;          //Internal Motion Unit, built into REV Control Hub
 
+    // For Qr Code Reader
+    OpenCvCamera camera;
+    AprilTagDetectionPipeline aprilTagDetectionPipeline;
+
+    static final double FEET_PER_METER = 3.28084;
+
+    // Lens intrinsics
+    // UNITS ARE PIXELS
+    // NOTE: this calibration is for the C920 webcam at 800x448.
+    // You will need to do your own calibration for other configurations!
+    double fx = 578.272;
+    double fy = 578.272;
+    double cx = 402.145;
+    double cy = 221.506;
+    int qr = 0;
+    // UNITS ARE METERS
+    double tagsize = 0.166;
+
+    int numFramesWithoutDetection = 0;
+
+    final float DECIMATION_HIGH = 3;
+    final float DECIMATION_LOW = 2;
+    final float THRESHOLD_HIGH_DECIMATION_RANGE_METERS = 1.0f;
+    final int THRESHOLD_NUM_FRAMES_NO_DETECTION_BEFORE_LOW_DECIMATION = 4;
+    // End Qr Code Reader Stuff
+
     @Override
     public void init(HardwareMap ahwMap) {
         init(ahwMap, false);
     }
+
+
 
     @Override
     public void init(HardwareMap ahwMap, boolean chassisOnly) {
@@ -34,6 +72,26 @@ public class Robot extends HardwareMap_Master {
         imu = hwMap.get(BNO055IMU.class, "imu");
         imu.initialize(new BNO055IMU.Parameters());
         imu.startAccelerationIntegration(new Position(), new Velocity(DistanceUnit.METER, 0, 0, 0, 0), 10 );
+
+        // For Qr Code Reader
+        int cameraMonitorViewId = ahwMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", ahwMap.appContext.getPackageName());
+        camera = OpenCvCameraFactory.getInstance().createWebcam(ahwMap.get(WebcamName.class, "Webcam"), cameraMonitorViewId);
+        aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
+        camera.setPipeline(aprilTagDetectionPipeline);
+        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
+        {
+            @Override
+            public void onOpened()
+            {
+                camera.startStreaming(800,448, OpenCvCameraRotation.UPRIGHT);
+            }
+
+            @Override
+            public void onError(int errorCode)
+            {
+
+            }
+        });
     }
 
     /**
@@ -276,5 +334,19 @@ public class Robot extends HardwareMap_Master {
         for (DcMotor motor: motors) {
             motor.setTargetPosition(position);
         }
+    }
+
+
+    // For Qr Code Reader
+    /**
+     * Finds all qr codes, returns the id of the first one. For our purposes, this will be
+     * the integers 1, 2, or 3.
+     * @param aprilTagDetectionPipeline
+     * @return AprilTag identification
+     */
+    public int GetQrCode(AprilTagDetectionPipeline aprilTagDetectionPipeline){
+        ArrayList<AprilTagDetection> detections = aprilTagDetectionPipeline.getDetectionsUpdate();
+        return detections.get(0).id;
+
     }
 }
