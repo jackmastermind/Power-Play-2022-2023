@@ -69,7 +69,7 @@ public class MecanumPlaybackOp extends LinearOpMode {
 
         waitForStart();
         runtime.reset();
-        playback.playAll(this);
+        playback.playAll(this, true, true);
     }
 }
 

@@ -38,6 +38,8 @@ public class MotorPlayback {
     private MotorSnapshot nextSnapshot;           //The next snapshot to play.
     private boolean finished;                     //Has the MotorPlayback run through all its data?
 
+    private final double Kp = 2.0 / 537.7; //will get to full power for half a rotation of error
+
     /**
      * Construct a new MotorPlayback object with a HardwareMap_Master.
      *
@@ -129,15 +131,20 @@ public class MotorPlayback {
      * playback is running.
      */
     public void continuePlaying() {
-        continuePlaying(0);
+        continuePlaying(0, true);
+    }
+
+    public void continuePlaying(boolean useEncoder)
+    {
+        continuePlaying(0, useEncoder);
     }
 
     // Play the next MotorSnapshot if the runtime plus a time offset has reached the appropriate timestamp.
     // The purpose of the offset is for playing snippets of a recording, rather than the whole thing.
-    private void continuePlaying(double timeOffset)
+    private void continuePlaying(double timeOffset, boolean useEncoder)
     {
         if (runtime.time() + timeOffset >= nextSnapshot.getTimestamp()) {
-            playNext();
+            playNext(useEncoder);
         }
     }
 
@@ -150,9 +157,14 @@ public class MotorPlayback {
         }
     }
 
+    public void playAll(LinearOpMode opMode, boolean trimEnds, boolean useEncoder)
+    {
+        play(0, Double.MAX_VALUE, trimEnds, useEncoder, opMode);
+    }
+
     public void playAll(LinearOpMode opMode, boolean trimEnds)
     {
-        play(0, Double.MAX_VALUE, trimEnds, opMode);
+        playAll(opMode, trimEnds, true);
     }
 
     /**
@@ -161,7 +173,7 @@ public class MotorPlayback {
      * @param to Final timestamp to play to
      * @param opMode The opmode in which this is being run, to check opModeIsActive()
      */
-    public void play(double from, double to, boolean trimEnds, LinearOpMode opMode) throws IllegalArgumentException
+    public void play(double from, double to, boolean trimEnds, boolean useEncoder, LinearOpMode opMode) throws IllegalArgumentException
     {
         found:  //This block just ensures that if 'from' is an invalid timestamp, an exception will be thrown
         {
@@ -196,16 +208,21 @@ public class MotorPlayback {
         double timeOffset = from - runtime.time();
 
         while (!finished && runtime.time() + timeOffset <= to && opMode.opModeIsActive()) {
-            continuePlaying(timeOffset);
+            continuePlaying(timeOffset, useEncoder);
         }
 
     }
 
     //Set all motors to the power level of the current snapshot & set all servos to the position of
     //the current snapshot
-    private void playNext() {
-        for (int i = 0; i < motors.length; i++) {
-            motors[i].setPower(nextSnapshot.getPowerLevels()[i]);
+    private void playNext(boolean useEncoder) {
+        if (useEncoder)
+        {
+            playNextEncoder();
+        }
+        else
+        {
+            playNextPower();
         }
 
         for (int i = 0; i < servos.length; i++) {
@@ -220,6 +237,22 @@ public class MotorPlayback {
         }
         else {
             finished = true;
+        }
+    }
+
+    private void playNextPower()
+    {
+        for (int i = 0; i < motors.length; i++) {
+            motors[i].setPower(nextSnapshot.getPowerLevels()[i]);
+        }
+    }
+
+    private void playNextEncoder()
+    {
+        for (int i = 0; i < motors.length; i++) {
+            int error = nextSnapshot.getEncoderPositions()[i] - motors[i].getCurrentPosition();
+
+            motors[i].setPower(Kp * error);
         }
     }
 
