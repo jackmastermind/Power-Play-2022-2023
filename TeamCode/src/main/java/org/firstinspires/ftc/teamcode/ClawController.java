@@ -16,9 +16,8 @@ public class ClawController
     public Servo wrist, claw;
     private double wristTarget;
     private boolean open;
-    //TODO: find these
     public final double openPos = 0;
-    public final double closePos = 1;
+    public final double closePos = 0.28;
 
     public ClawController(HardwareMap hardwareMap)
     {
