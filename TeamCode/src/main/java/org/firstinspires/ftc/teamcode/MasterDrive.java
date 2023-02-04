@@ -47,6 +47,7 @@ public class MasterDrive extends LinearOpMode
                 servos, 0.1, telemetry);
 
         slide.ignoreMinMax = true; //Todo: Remove this once min max are determined
+        slide.raiseLinear();
 
         waitForStart();
         telemetry.setAutoClear(true);
