@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -17,6 +18,8 @@ public class SlideController
     //Motor for controlling the spool
     public DcMotor spoolMotor;
 
+    public Servo leftLinear, rightLinear;
+
     //Values to limit how much the slide will extend
     double minTicks = 0;
     double maxTicks = 0;
@@ -25,6 +28,10 @@ public class SlideController
     public SlideController(HardwareMap hardwareMap)
     {
         spoolMotor = hardwareMap.get(DcMotor.class, "spoolMotor");
+        leftLinear = hardwareMap.get(Servo.class, "left");
+        rightLinear = hardwareMap.get(Servo.class, "right");
+
+        lowerLinear();
 
         //TODO: I'm not actually sure if all of these are correct
         spoolMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -68,6 +75,18 @@ public class SlideController
             //Ignore limits
             spoolMotor.setPower(input * speed);
         }
+    }
+
+    public void raiseLinear()
+    {
+        leftLinear.setPosition(0.8);
+        rightLinear.setPosition(0.8);
+    }
+
+    public void lowerLinear()
+    {
+        leftLinear.setPosition(0.3);
+        rightLinear.setPosition(0.3);
     }
 
 

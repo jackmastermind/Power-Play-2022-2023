@@ -14,8 +14,9 @@ public class ServoTest extends LinearOpMode {
     @Override
     public void runOpMode() {
         //INITIALIZATION CODE
-        Servo servo = hardwareMap.get(Servo.class, "servo");
-        double servoTarget = servo.getPosition();
+        Servo left = hardwareMap.get(Servo.class, "left");
+        Servo right = hardwareMap.get(Servo.class, "right");
+        double servoTarget = left.getPosition();
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -43,10 +44,11 @@ public class ServoTest extends LinearOpMode {
             servoTarget = Math.max(servoTarget, 0);
             servoTarget = Math.min(servoTarget, 1);
 
-            servo.setPosition(servoTarget);
+            left.setPosition(servoTarget);
+            right.setPosition(servoTarget);
             telemetry.addData("Status", "Running");
             telemetry.addData("servoTarget", servoTarget);
-            telemetry.addData("Servo position", servo.getPosition());
+            telemetry.addData("Servo position", left.getPosition());
             telemetry.update();
 
             //test comment
