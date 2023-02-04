@@ -57,11 +57,15 @@ public class CameraController {
 
     /**
      * Finds all qr codes, returns the id of the first one. For our purposes, this will be
-     * the integers 1, 2, or 3.
+     * the integers 1, 2, or 3-- or 0, if none are detected
      * @return AprilTag identification
      */
     public int GetQrCode(){
         ArrayList<AprilTagDetection> detections = pipeline.getDetectionsUpdate();
+        if (detections == null || detections.size() == 0)
+        {
+            return 0;
+        }
         return detections.get(0).id;
 
     }
