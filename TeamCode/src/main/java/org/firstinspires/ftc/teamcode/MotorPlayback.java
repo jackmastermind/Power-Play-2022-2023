@@ -38,7 +38,7 @@ public class MotorPlayback {
     private MotorSnapshot nextSnapshot;           //The next snapshot to play.
     private boolean finished;                     //Has the MotorPlayback run through all its data?
 
-    private final double Kp = 1.0 / 537.7;
+    private final double Kp = 2.0 / 537.7; //will get to full power for half a rotation of error
 
     /**
      * Construct a new MotorPlayback object with a HardwareMap_Master.
