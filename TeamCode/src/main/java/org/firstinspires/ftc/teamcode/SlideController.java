@@ -22,7 +22,7 @@ public class SlideController
 
     //Values to limit how much the slide will extend
     double minTicks = 0;
-    double maxTicks = 0;
+    double maxTicks = 537.7 * 8; //estimate: 8 rotations *should* bring it up to max
     public boolean ignoreMinMax = false;
 
     public SlideController(HardwareMap hardwareMap)
@@ -33,7 +33,6 @@ public class SlideController
 
         lowerLinear();
 
-        //TODO: I'm not actually sure if all of these are correct
         spoolMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         spoolMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         spoolMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
