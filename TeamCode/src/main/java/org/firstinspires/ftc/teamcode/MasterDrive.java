@@ -23,7 +23,7 @@ public class MasterDrive extends LinearOpMode
 
     //MOTOR VARIABLES
     double armSpeed = 1;
-    double clawSpeed = 0.003;
+    double clawSpeed = -0.003;
     double susanSpeed = 1;
 
     boolean aDown = false;
@@ -47,13 +47,13 @@ public class MasterDrive extends LinearOpMode
                 servos, 0.1, telemetry);
 
         slide.ignoreMinMax = true; //Todo: Remove this once min max are determined
-        slide.raiseLinear();
 
         waitForStart();
         telemetry.setAutoClear(true);
         runtime.reset();
 
         double lastRuntime = runtime.time();
+        slide.raiseLinear();
 
         while(opModeIsActive())
         {

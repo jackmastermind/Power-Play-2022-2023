@@ -14,7 +14,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class ClawController
 {
     public Servo wrist, claw;
-    private double wristTarget;
+    private double wristTarget = 0.5;
     private boolean open;
     public final double openPos = 0;
     public final double closePos = 0.28;
