@@ -15,14 +15,13 @@ public class SusanController
 {
     public DcMotor susan;
     public double positionLimit = 36; //Core hex does 288. 36 is ⅛ of that.
-    public boolean ignoreMinMax;
 
     public SusanController(HardwareMap hardwareMap)
     {
         susan = hardwareMap.get(DcMotor.class, "susan");
     }
 
-    public void moveSusan(double input, double speed)
+    public void moveSusan(double input, double speed, boolean ignoreMinMax)
     {
         if (!ignoreMinMax)
         {
@@ -43,6 +42,11 @@ public class SusanController
         {
             susan.setPower(input * speed);
         }
+    }
+
+    public void moveSusan(double input, double speed)
+    {
+        moveSusan(input, speed, false);
     }
 
     public void LogValues(Telemetry telemetry)
