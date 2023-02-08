@@ -13,7 +13,6 @@ import java.util.ArrayList;
 public class CameraController {
     public OpenCvCamera camera;
     public AprilTagDetectionPipeline pipeline;
-    public static final double FEET_PER_METER = 3.28084;
 
     // Lens intrinsics
     // UNITS ARE PIXELS
@@ -23,7 +22,6 @@ public class CameraController {
     double fy = 578.272;
     double cx = 402.145;
     double cy = 221.506;
-    int qr = 0;
 
     // UNITS ARE METERS
     double tagsize = 0.166;
@@ -57,12 +55,35 @@ public class CameraController {
 
     /**
      * Finds all qr codes, returns the id of the first one. For our purposes, this will be
-     * the integers 1, 2, or 3.
+     * the integers 1, 2, or 3-- or 0 if no detections are found.
      * @return AprilTag identification
      */
     public int GetQrCode(){
         ArrayList<AprilTagDetection> detections = pipeline.getDetectionsUpdate();
-        return detections.get(0).id;
+        if (detections != null)
+        {
+            if (detections.size() == 0)
+            {
+                numFramesWithoutDetection++;
 
+                if (numFramesWithoutDetection >= THRESHOLD_NUM_FRAMES_NO_DETECTION_BEFORE_LOW_DECIMATION)
+                {
+                    pipeline.setDecimation(DECIMATION_LOW);
+                }
+            }
+            else
+            {
+                numFramesWithoutDetection = 0;
+
+                if(detections.get(0).pose.z < THRESHOLD_HIGH_DECIMATION_RANGE_METERS)
+                {
+                    pipeline.setDecimation(DECIMATION_HIGH);
+                }
+
+                return detections.get(0).id;
+            }
+        }
+
+        return 0;
     }
 }
