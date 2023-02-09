@@ -94,6 +94,15 @@ public class MasterDrive extends LinearOpMode
             //Arm
             slide.MoveSlide(gamepad2.left_stick_y, armSpeed);
 
+            if (gamepad2.dpad_up)
+            {
+                slide.raiseLinear();
+            }
+            else if (gamepad2.dpad_down)
+            {
+                slide.lowerLinear();
+            }
+
             //Wrist
             clawController.moveWrist(gamepad2.right_stick_y, clawSpeed);
 

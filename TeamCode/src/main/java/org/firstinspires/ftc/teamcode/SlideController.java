@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -31,9 +32,7 @@ public class SlideController
         leftLinear = hardwareMap.get(Servo.class, "left");
         rightLinear = hardwareMap.get(Servo.class, "right");
 
-        lowerLinear();
-
-        //TODO: I'm not actually sure if all of these are correct
+        spoolMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         spoolMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         spoolMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         spoolMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
