@@ -24,12 +24,14 @@ public class TestCameraController extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
+        cameraController.StartQRDetectThread(this);
+
         //RUN ONE TIME CODE HERE
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             //LOOPING CODE HERE
-            telemetry.addData("QR id", cameraController.GetQrCode());
+            telemetry.addData("QR id", cameraController.qr);
             telemetry.addData("Status", "Running");
             telemetry.update();
 
