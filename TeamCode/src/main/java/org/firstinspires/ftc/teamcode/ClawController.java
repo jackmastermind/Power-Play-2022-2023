@@ -23,9 +23,6 @@ public class ClawController
     {
         wrist = hardwareMap.get(Servo.class, "clawWrist");
         claw = hardwareMap.get(Servo.class, "clawServo");
-
-        wrist.setPosition(wristTarget);
-        closeClaw();
     }
 
     public void openClaw()

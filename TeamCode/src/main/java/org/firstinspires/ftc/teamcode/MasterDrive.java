@@ -54,6 +54,8 @@ public class MasterDrive extends LinearOpMode
 
         double lastRuntime = runtime.time();
         slide.raiseLinear();
+        clawController.closeClaw();
+        clawController.moveWrist(0, 1); //Initializes to start pos
 
         while(opModeIsActive())
         {
