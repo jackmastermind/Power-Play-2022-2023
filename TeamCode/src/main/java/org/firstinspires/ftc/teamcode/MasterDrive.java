@@ -24,7 +24,7 @@ public class MasterDrive extends LinearOpMode
     //MOTOR VARIABLES
     double armSpeed = 1;
     double clawSpeed = -0.003;
-    double susanSpeed = 1;
+    double susanSpeed = 0.5;
 
     boolean aDown = false;
 
