@@ -84,8 +84,8 @@ public class SlideController
 
     public void lowerLinear()
     {
-        leftLinear.setPosition(0.5);
-        rightLinear.setPosition(0.5);
+        leftLinear.setPosition(0.3);
+        rightLinear.setPosition(0.3);
     }
 
 
