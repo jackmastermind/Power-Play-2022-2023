@@ -57,20 +57,20 @@ public class SlideController
     {
         if(!ignoreMinMax)
         {
-            double pos = spoolMotor.getCurrentPosition();
+            double pos = Math.abs(spoolMotor.getCurrentPosition());
             double d = -Math.pow(Math.max((pos-0)-maxTicks/2, (maxTicks-pos)-maxTicks/2),2)+1.1;
             dampValue = Math.max(0, Math.min(1, d)); //Clamp the value between 0 and 1
 
             //Limit the spool based on minTicks and maxTicks
-            if (input > 0 && pos < maxTicks)
+            if (input > 0 && spoolMotor.getCurrentPosition() < maxTicks)
             {
                 //double dampValue = (pos - minTicks) / maxTicks;
-                spoolMotor.setPower((input * speed)/dampValue);
+                spoolMotor.setPower((input * speed)); ///dampValue
             }
-            else if(input < 0 && pos > minTicks)
+            else if(input < 0 && spoolMotor.getCurrentPosition() > minTicks)
             {
                 //double dampValue = (maxTicks - pos) / maxTicks;
-                spoolMotor.setPower((input * speed)/dampValue);
+                spoolMotor.setPower((input * speed));
             }
             else
             {
