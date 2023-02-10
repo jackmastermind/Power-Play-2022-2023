@@ -173,39 +173,45 @@ public class MotorPlayback {
      * @param to Final timestamp to play to
      * @param opMode The opmode in which this is being run, to check opModeIsActive()
      */
-    public void play(double from, double to, boolean trimEnds, boolean useEncoder, LinearOpMode opMode) throws IllegalArgumentException
-    {
-        found:  //This block just ensures that if 'from' is an invalid timestamp, an exception will be thrown
+    public void play(double from, double to, boolean trimEnds, boolean useEncoder, LinearOpMode opMode) throws IllegalArgumentException {
+        if (trimEnds) //TODO: Trimends is not working right now.
         {
-            //Go through the data, set the current snapshot to the one just after 'from'
-            for (int i = 0; i < data.size(); i++) {
+            found:  //This block just ensures that if 'from' is an invalid timestamp, an exception will be thrown
+                    {
+                        //Go through the data, set the current snapshot to the one just after 'from'
+                        for (int i = 0; i < data.size(); i++) {
+                            MotorSnapshot snapshot = data.get(i);
+                            if (snapshot.getTimestamp() >= from) {
+                                // If trimEnds is on and the snapshot is zero, don't stop, keep going
+                                if (!snapshot.isZero()) {
+                                    dataIndex = i;
+                                    nextSnapshot = snapshot;
+                                    from = snapshot.getTimestamp();
+                                    break found;
+                                }
+                            }
+                        }
+                        // This exception will only be thrown if the above loop is not broken - either it's out of bounds,
+                        // or, if trimEnds is on, it could be that there are no nonzero snapshots after the starting point
+                        throw new IllegalArgumentException(String.format("Starting timestamp %f not in recording", from));
+                    }
+            for (int i = data.size() - 1; i >= dataIndex; i--) {
                 MotorSnapshot snapshot = data.get(i);
-                if (snapshot.getTimestamp() >= from) {
-                    // If trimEnds is on and the snapshot is zero, don't stop, keep going
-                    if ( !(trimEnds && snapshot.isZero()) ) {
-                        dataIndex = i;
-                        nextSnapshot = snapshot;
-                        from = snapshot.getTimestamp();
-                        break found;
+                if (snapshot.getTimestamp() <= to) {
+                    if (!snapshot.isZero()) {
+                        to = snapshot.getTimestamp();
                     }
                 }
             }
-            // This exception will only be thrown if the above loop is not broken - either it's out of bounds,
-            // or, if trimEnds is on, it could be that there are no nonzero snapshots after the starting point
-            throw new IllegalArgumentException(String.format("Starting timestamp %f not in recording", from));
         }
-        for (int i = data.size() - 1; i >= dataIndex; i--)
+        else
         {
-            MotorSnapshot snapshot = data.get(i);
-            if (snapshot.getTimestamp() <= to)
-            {
-                if ( !(trimEnds && snapshot.isZero()) ) {
-                    to = snapshot.getTimestamp();
-                }
-            }
+            to = Math.min(data.get(data.size() - 1).getTimestamp(), to);
         }
 
         double timeOffset = from - runtime.time();
+        System.out.println("from: " + from);
+        System.out.println("to: " + to);
 
         while (!finished && runtime.time() + timeOffset <= to && opMode.opModeIsActive()) {
             continuePlaying(timeOffset, useEncoder);
