@@ -27,6 +27,10 @@ public class MasterDrive extends LinearOpMode
     double susanSpeed = 0.5;
 
     boolean aDown = false;
+    boolean aLastPass = false;
+
+    //Todo: Remove this later
+    double amount = 0.5;
 
 
     private final ElapsedTime runtime = new ElapsedTime();
@@ -93,6 +97,10 @@ public class MasterDrive extends LinearOpMode
 
             //region OPERATING SECTION
 
+            //Todo: This is for testing, remove later
+            amount += (gamepad1.dpad_up ? 0:1 - (gamepad1.dpad_down ? 0:1)) * deltaTime * 0.01;
+            if(gamepad1.y){slide.changeLinear(amount);}
+
             //Arm
             slide.MoveSlide(gamepad2.left_stick_y, armSpeed);
 
@@ -109,13 +117,16 @@ public class MasterDrive extends LinearOpMode
             clawController.moveWrist(gamepad2.right_stick_y, clawSpeed);
 
             //Claw
-            if (gamepad2.a && !aDown)
+            boolean aPressed = gamepad2.a;
+            if (aPressed && !aLastPass && !aDown)
             {
-               clawController.toggleClaw();
+                clawController.toggleClaw();
             }
             else if (!gamepad2.a){
                 aDown = false;
             }
+
+            aLastPass = aPressed;
 
             //Susan
             susanController.moveSusan(gamepad2.right_trigger - gamepad2.left_trigger,
@@ -131,6 +142,8 @@ public class MasterDrive extends LinearOpMode
             //endregion
 
             //region TELEMETRY
+            telemetry.addData("amount", amount);
+
             telemetry.addLine("DRIVE MOTORS");
             telemetry.addData("fl", flPower);
             telemetry.addData("fr", frPower);

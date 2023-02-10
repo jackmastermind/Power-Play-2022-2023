@@ -88,6 +88,11 @@ public class SlideController
         rightLinear.setPosition(0.3);
     }
 
+    public void changeLinear(double amount)
+    {
+        leftLinear.setPosition(amount);
+        rightLinear.setPosition(amount);
+    }
 
     public void LogValues(Telemetry telemetry)
     {
