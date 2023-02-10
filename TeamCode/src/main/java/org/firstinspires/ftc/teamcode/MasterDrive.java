@@ -26,11 +26,16 @@ public class MasterDrive extends LinearOpMode
     double clawSpeed = -0.003;
     double susanSpeed = 0.5;
 
+    double slideMin = -20;
+    double slideMax = -4700;
+
     boolean aDown = false;
     boolean aLastPass = false;
 
     //Todo: Remove this later
     double amount = 0.5;
+
+
 
 
     private final ElapsedTime runtime = new ElapsedTime();
@@ -50,7 +55,8 @@ public class MasterDrive extends LinearOpMode
         MotorRecorder recorder = new MotorRecorder(runtime, hardwareMap, motors,
                 servos, 0.1, telemetry);
 
-        slide.ignoreMinMax = true; //Todo: Remove this once min max are determined
+        //slide.ignoreMinMax = true; //Todo: Remove this once min max are determined
+        slide.SetMinMax(slideMin, slideMax);
 
         waitForStart();
         telemetry.setAutoClear(true);
