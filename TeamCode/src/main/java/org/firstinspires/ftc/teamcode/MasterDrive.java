@@ -163,6 +163,8 @@ public class MasterDrive extends LinearOpMode
             //endregion
 
             lastRuntime = runtime.time();  //Set last runtime to current runtime
+
+            recorder.updateData();
         }
     }
 }

@@ -243,7 +243,9 @@ public class MotorPlayback {
     private void playNextPower()
     {
         for (int i = 0; i < motors.length; i++) {
+            System.out.println("setting power!");
             motors[i].setPower(nextSnapshot.getPowerLevels()[i]);
+            System.out.println("power set to: " + motors[i].getPower());
         }
     }
 

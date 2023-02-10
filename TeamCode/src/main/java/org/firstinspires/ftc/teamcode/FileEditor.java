@@ -85,6 +85,7 @@ public abstract class FileEditor  {
         try {
             Gson gson = new Gson();
             File location = new File(context.getExternalFilesDir(null) + "/" + filePath);
+            System.out.println(location.getAbsolutePath());
             InputStreamReader reader = new InputStreamReader(new FileInputStream(location));
 
             return gson.fromJson(reader, outputType);
