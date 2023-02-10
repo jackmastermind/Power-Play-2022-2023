@@ -26,8 +26,8 @@ public class MasterDrive extends LinearOpMode
     double clawSpeed = -0.003;
     double susanSpeed = 0.5;
 
-    double slideMin = -20;
-    double slideMax = -4700;
+    double slideMax = 0;
+    double slideMin = -4700;
 
     boolean aDown = false;
     boolean aLastPass = false;
