@@ -26,6 +26,8 @@ public class SlideController
     double maxTicks = 0;
     public boolean ignoreMinMax = false;
 
+    public double dampValue;
+
     public SlideController(HardwareMap hardwareMap)
     {
         spoolMotor = hardwareMap.get(DcMotor.class, "spoolMotor");
@@ -55,14 +57,20 @@ public class SlideController
     {
         if(!ignoreMinMax)
         {
+            double pos = spoolMotor.getCurrentPosition();
+            double d = -Math.pow(Math.max((pos-0)-maxTicks/2, (maxTicks-pos)-maxTicks/2),2)+1.1;
+            dampValue = Math.max(0, Math.min(1, d)); //Clamp the value between 0 and 1
+
             //Limit the spool based on minTicks and maxTicks
-            if (input > 0 && spoolMotor.getCurrentPosition() < maxTicks)
+            if (input > 0 && pos < maxTicks)
             {
-                spoolMotor.setPower(input * speed);
+                //double dampValue = (pos - minTicks) / maxTicks;
+                spoolMotor.setPower((input * speed)/dampValue);
             }
-            else if(input < 0 && spoolMotor.getCurrentPosition() > minTicks)
+            else if(input < 0 && pos > minTicks)
             {
-                spoolMotor.setPower(input * speed);
+                //double dampValue = (maxTicks - pos) / maxTicks;
+                spoolMotor.setPower((input * speed)/dampValue);
             }
             else
             {
@@ -100,6 +108,7 @@ public class SlideController
         telemetry.addData("Slide Motor Position", spoolMotor.getCurrentPosition());
         telemetry.addData("Min", minTicks);
         telemetry.addData("Max", maxTicks);
+        telemetry.addData("Damp Value", dampValue);
     }
 }
 
