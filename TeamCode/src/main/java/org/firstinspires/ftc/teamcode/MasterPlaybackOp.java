@@ -94,7 +94,7 @@ public class MasterPlaybackOp extends LinearOpMode {
 
         waitForStart();
         runtime.reset();
-        playback.playAll(this, true, true);
+        playback.playAll(this, false, false);
     }
 }
 
