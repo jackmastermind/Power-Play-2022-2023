@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @Autonomous(name="MecanumAutoOp")
+@Disabled
 public class MecanumAutoOp extends LinearOpMode {
 
     // Declare OpMode members.

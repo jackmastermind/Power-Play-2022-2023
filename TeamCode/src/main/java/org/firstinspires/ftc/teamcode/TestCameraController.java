@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Use this as a template for making new opmodes.
  */
 
-@TeleOp(name="Test Camera Controller")
+@TeleOp(name="Test Camera Controller [TESTING ONLY]")
 public class TestCameraController extends LinearOpMode {
 
     // Declare OpMode members.

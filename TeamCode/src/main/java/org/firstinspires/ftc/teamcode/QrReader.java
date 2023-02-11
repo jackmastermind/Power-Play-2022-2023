@@ -17,7 +17,7 @@ import java.util.ArrayList;
  * Use this as a template for making new opmodes.
  */
 
-@TeleOp(name="QrReader")
+@TeleOp(name="QrReader [FOR TESTING ONLY]")
 public class QrReader extends LinearOpMode {
 
     OpenCvCamera camera;

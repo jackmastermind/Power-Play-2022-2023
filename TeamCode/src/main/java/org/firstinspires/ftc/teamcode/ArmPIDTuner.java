@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @TeleOp(name="Arm PID Tuner")
+@Disabled
 public class ArmPIDTuner extends LinearOpMode {
 
     // Declare OpMode members.

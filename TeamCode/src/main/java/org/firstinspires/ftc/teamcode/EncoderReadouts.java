@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Use this as a template for making new opmodes.
  */
 
-@TeleOp(name="EncoderReadouts")
+@TeleOp(name="EncoderReadouts [FOR TESTING ONLY]")
 public class EncoderReadouts extends LinearOpMode {
     // Declare OpMode members.
     private final ElapsedTime runtime = new ElapsedTime();

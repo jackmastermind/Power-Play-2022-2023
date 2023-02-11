@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @Autonomous(name="DiffAutoOp")
+@Disabled
 public class DiffAutoOp extends LinearOpMode {
 
     // Declare OpMode members.

@@ -35,7 +35,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Autonomous(name="Master Playback Op")
+@Autonomous(name="Master Playback Op [FOR TESTING ONLY]")
 @SuppressWarnings("FieldCanBeLocal")
 public class MasterPlaybackOp extends LinearOpMode {
 

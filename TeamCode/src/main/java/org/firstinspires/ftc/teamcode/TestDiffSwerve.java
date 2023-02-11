@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @TeleOp(name="TestDiffSwerve")
+@Disabled
 public class TestDiffSwerve extends LinearOpMode {
 
     // Declare OpMode members.
