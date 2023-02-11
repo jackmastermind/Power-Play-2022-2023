@@ -35,9 +35,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Autonomous(name="Master Autonomous [FOR COMPETITION]")
+@Autonomous(name="Master Autonomous [Red Right/Blue Left]")
 @SuppressWarnings("FieldCanBeLocal")
-public class MasterAutonomous extends LinearOpMode {
+public class MasterAutonomousA5F5 extends LinearOpMode {
 
     private final MecanumMap_Master mecanum = new MecanumMap_Master();
     private final ElapsedTime runtime = new ElapsedTime();
@@ -94,9 +94,10 @@ public class MasterAutonomous extends LinearOpMode {
             }
         }
 
+        // 3-2-1 for the 5 positions
         if (cameraController.qr == 1)
         {
-            playback1.playAll(this, false, false);
+            playback3.playAll(this, false, false);
         }
         else if (cameraController.qr == 2)
         {
@@ -104,7 +105,7 @@ public class MasterAutonomous extends LinearOpMode {
         }
         else
         {
-            playback3.playAll(this, false, false);
+            playback1.playAll(this, false, false);
         }
 
         while (opModeIsActive())
