@@ -51,7 +51,7 @@ public class MasterAutonomous extends LinearOpMode {
     private Servo[] servos;
 
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode() {
         telemetry.setAutoClear(false);
 
         mecanum.init(hardwareMap);
@@ -67,11 +67,11 @@ public class MasterAutonomous extends LinearOpMode {
 
         telemetry.addData("Status", "loading recordings...");
 
-        MotorPlayback playback1 = new MotorPlayback("recording1.json", runtime, hardwareMap,
+        MotorPlayback playback1 = new MotorPlayback("recordingA.json", runtime, hardwareMap,
                                                     motors, servos, telemetry);
-        MotorPlayback playback2 = new MotorPlayback("recording2.json", runtime, hardwareMap,
+        MotorPlayback playback2 = new MotorPlayback("recordingX.json", runtime, hardwareMap,
                                                     motors, servos, telemetry);
-        MotorPlayback playback3 = new MotorPlayback("recording3.json", runtime, hardwareMap,
+        MotorPlayback playback3 = new MotorPlayback("recordingY.json", runtime, hardwareMap,
                                                     motors, servos, telemetry);
 
         telemetry.addData("Status", "initialized");
@@ -80,11 +80,18 @@ public class MasterAutonomous extends LinearOpMode {
         //RUNNING
         waitForStart();
         runtime.reset();
+        slide.raiseLinear();
         cameraController.StartQRDetectThread(this);
 
         while (cameraController.qr == 0)
         {
-            Thread.sleep(20);
+            try {
+                Thread.sleep(20);
+            }
+            catch (InterruptedException e)
+            {
+                telemetry.addData("interrupted exception", e.toString());
+            }
         }
 
         if (cameraController.qr == 1)
@@ -98,6 +105,17 @@ public class MasterAutonomous extends LinearOpMode {
         else
         {
             playback3.playAll(this, false, false);
+        }
+
+        while (opModeIsActive())
+        {
+            try {
+                Thread.sleep(20);
+            }
+            catch (InterruptedException e)
+            {
+                telemetry.addData("interrupted exception", e.toString());
+            }
         }
     }
 }
