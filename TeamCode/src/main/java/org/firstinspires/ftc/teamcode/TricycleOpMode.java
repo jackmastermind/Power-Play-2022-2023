@@ -32,7 +32,7 @@ public class TricycleOpMode extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             //LOOPING CODE HERE
-            if(gamepad1.right_trigger > 0) //half-speed mode
+            if(gamepad1.right_trigger > 0.1) //half-speed mode
             {
                 left.setPower(0.5*(gamepad1.left_stick_y-gamepad1.left_stick_x));
                 right.setPower(0.5*(gamepad1.left_stick_y+gamepad1.left_stick_x));
