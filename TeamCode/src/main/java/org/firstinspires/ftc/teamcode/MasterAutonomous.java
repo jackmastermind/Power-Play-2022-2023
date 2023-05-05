@@ -52,70 +52,72 @@ public class MasterAutonomous extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        telemetry.setAutoClear(false);
+        try {
 
-        mecanum.init(hardwareMap);
-        slide           = new SlideController(hardwareMap);
-        clawController  = new ClawController(hardwareMap);
-        susanController = new SusanController(hardwareMap);
-        cameraController = new CameraController(hardwareMap);
 
-        motors = new DcMotor[] {mecanum.frontLeft, mecanum.frontRight,
-                                mecanum.backLeft, mecanum.backRight,
-                                slide.spoolMotor, susanController.susan};
-        servos = new Servo[]   {clawController.claw, clawController.wrist};
+            telemetry.setAutoClear(false);
 
-        telemetry.addData("Status", "loading recordings...");
+            mecanum.init(hardwareMap);
+            slide = new SlideController(hardwareMap);
+            clawController = new ClawController(hardwareMap);
+            susanController = new SusanController(hardwareMap);
+            cameraController = new CameraController(hardwareMap);
 
-        MotorPlayback playback1 = new MotorPlayback("recordingA.json", runtime, hardwareMap,
-                                                    motors, servos, telemetry);
-        MotorPlayback playback2 = new MotorPlayback("recordingX.json", runtime, hardwareMap,
-                                                    motors, servos, telemetry);
-        MotorPlayback playback3 = new MotorPlayback("recordingY.json", runtime, hardwareMap,
-                                                    motors, servos, telemetry);
+            motors = new DcMotor[]{mecanum.frontLeft, mecanum.frontRight,
+                    mecanum.backLeft, mecanum.backRight,
+                    slide.spoolMotor, susanController.susan};
+            servos = new Servo[]{clawController.claw, clawController.wrist};
 
-        telemetry.addData("Status", "initialized");
-        telemetry.update();
+            telemetry.addData("Status", "loading recordings...");
 
-        //RUNNING
-        waitForStart();
-        runtime.reset();
-        slide.raiseLinear();
-        cameraController.StartQRDetectThread(this);
+            MotorPlayback playback1 = new MotorPlayback("recordingA.json", runtime, hardwareMap,
+                    motors, servos, telemetry);
+            MotorPlayback playback2 = new MotorPlayback("recordingB.json", runtime, hardwareMap,
+                    motors, servos, telemetry);
+            MotorPlayback playback3 = new MotorPlayback("recordingY.json", runtime, hardwareMap,
+                    motors, servos, telemetry);
 
-        while (cameraController.qr == 0)
-        {
+            telemetry.addData("Status", "initialized");
+            telemetry.update();
+
+            //RUNNING
+            waitForStart();
+            runtime.reset();
+            slide.raiseLinear();
+            cameraController.StartQRDetectThread(this);
+
+            while (cameraController.qr == 0) {
+                try {
+                    Thread.sleep(20);
+                } catch (InterruptedException e) {
+                    telemetry.addData("interrupted exception", e.toString());
+                }
+            }
+
             try {
-                Thread.sleep(20);
-            }
-            catch (InterruptedException e)
-            {
-                telemetry.addData("interrupted exception", e.toString());
-            }
-        }
 
-        if (cameraController.qr == 1)
-        {
-            playback1.playAll(this, false, false);
-        }
-        else if (cameraController.qr == 2)
-        {
-            playback2.playAll(this, false, false);
-        }
-        else
-        {
-            playback3.playAll(this, false, false);
-        }
+                if (cameraController.qr == 1) {
+                    playback1.playAll(this, false, true);
+                } else if (cameraController.qr == 2) {
+                    playback2.playAll(this, false, true);
+                } else {
+                    playback3.playAll(this, false, true);
+                }
+            } catch (Exception e) {
+                telemetry.addData("exception", e.toString());
+            }
 
-        while (opModeIsActive())
+            while (opModeIsActive()) {
+                try {
+                    Thread.sleep(20);
+                } catch (InterruptedException e) {
+                    telemetry.addData("interrupted exception", e.toString());
+                }
+            }
+        }
+        catch (Exception e)
         {
-            try {
-                Thread.sleep(20);
-            }
-            catch (InterruptedException e)
-            {
-                telemetry.addData("interrupted exception", e.toString());
-            }
+            //pass
         }
     }
 }
